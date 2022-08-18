@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/note_card.dart';
 import '../provider/note.dart';
@@ -6,11 +7,13 @@ import '../provider/note.dart';
 class NoteHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var notes = Notes().notes;
+    var notesData = Provider.of<Notes>(context);
+    var notes = notesData.notes;
     int notesLength = notes.length;
     if (notes.length > 11) {
       notesLength = 11;
     }
+
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -18,9 +21,11 @@ class NoteHorizontalList extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: notesLength,
           itemBuilder: (context, index) {
-            if (index < notesLength - 1) {
-              return NoteCard(
-                  notes[index].title, notes[index].text, notes[index].date);
+            if (index <= notesLength - 1) {
+              return ChangeNotifierProvider.value(
+                value: notes[index],
+                child: NoteCard(),
+              );
             } else {
               return Card(
                 elevation: 5,
