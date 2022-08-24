@@ -1,8 +1,9 @@
+import 'package:evernote_clone/bloc/notes_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../models/note.dart';
 import '../widgets/my_bottom_app_bar.dart';
-import '../provider/note.dart';
 
 class NoteDetailsScreen extends StatefulWidget {
   static const routeName = 'note-details';
@@ -15,8 +16,14 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   late FocusNode _focusText;
   late FocusNode _focusTitle;
   bool _isEditing = false;
+  bool _wasDelete = false;
   final _form = GlobalKey<FormState>();
-  var editedNote = Note(id: null, title: '', text: '', date: DateTime.now());
+  var editedNote = Note(
+    id: '',
+    title: '',
+    text: '',
+    date: DateTime.now(),
+  );
 
   @override
   void initState() {
@@ -34,21 +41,40 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   }
 
   void _saveNote(BuildContext ctx) {
+    var noteBloc = BlocProvider.of<NotesBloc>(ctx);
     editModeOff();
     _form.currentState!.save();
-    if (editedNote.id != null) {
-      Provider.of<Notes>(context, listen: false).updateNote(editedNote);
-    } else {
-      if (editedNote.title.isEmpty) {
-        editedNote = Note(
-          id: editedNote.id,
-          title: 'Untitled note',
-          text: editedNote.text,
-          date: editedNote.date,
-        );
-      }
-      Provider.of<Notes>(context, listen: false).addNote(editedNote);
+    if (editedNote.title.isEmpty) {
+      editedNote = Note(
+        id: editedNote.id,
+        title: 'Untitled note',
+        text: editedNote.text,
+        date: editedNote.date,
+      );
     }
+    if (editedNote.id.isEmpty) {
+      editedNote = Note(
+        id: DateTime.now().toString(),
+        title: editedNote.title,
+        text: editedNote.text,
+        date: editedNote.date,
+      );
+    }
+    editedNote = Note(
+      id: editedNote.id,
+      title: editedNote.title,
+      text: editedNote.text,
+      date: DateTime.now(),
+    );
+    noteBloc.add(AddNoteEvent(editedNote));
+  }
+
+  void _deleteNote(BuildContext ctx) {
+    var noteBloc = BlocProvider.of<NotesBloc>(ctx);
+    setState(() {
+      _wasDelete = true;
+    });
+    noteBloc.add(RemoveNoteEvent(editedNote));
   }
 
   void editModeOn() {
@@ -63,12 +89,50 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     });
   }
 
+  void showMoreActions() {
+    showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return GestureDetector(
+            onTap: () {},
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: [
+                InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete),
+                        SizedBox(width: 15),
+                        Text(
+                          'Delete',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    _deleteNote(context);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        }).then((_) {
+      if (_wasDelete) {
+        Navigator.pop(context);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String noteId;
+    final Note note;
     if (ModalRoute.of(context)?.settings.arguments != null) {
-      final noteId = ModalRoute.of(context)!.settings.arguments as String;
-      editedNote = Provider.of<Notes>(context, listen: false).findById(noteId);
+      note = ModalRoute.of(context)!.settings.arguments as Note;
+      editedNote = note;
     }
 
     return WillPopScope(
@@ -96,7 +160,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: showMoreActions,
               icon: Icon(Icons.more_horiz),
             ),
           ],

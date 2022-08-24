@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
-import 'package:provider/provider.dart';
 
+import '../bloc/notes_bloc.dart';
+import '../models/note.dart';
 import '../screens/note_details_screen.dart';
-import '../provider/note.dart';
 
 class NoteCard extends StatelessWidget {
+  final Note loadedNote;
   // final String title;
   // final String text;
   // final DateTime date;
 
-  // NoteCard(this.title, this.text, this.date);
+  NoteCard(this.loadedNote);
+
+  String _getDate(DateTime date) {
+    final Duration duration = DateTime.now().difference(date);
+    if (duration.inMinutes == 0)
+      return 'just now';
+    else if (duration.inHours == 0)
+      return '${duration.inMinutes} min ago';
+    else if (duration.inDays == 0)
+      return '${duration.inHours} h ago';
+    else
+      return DateFormat.d().add_MMM().format(date);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final note = Provider.of<Note>(context);
+    final note = loadedNote;
     return Card(
       elevation: 5,
       margin: EdgeInsets.all(10),
@@ -24,7 +38,7 @@ class NoteCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context)
-              .pushNamed(NoteDetailsScreen.routeName, arguments: note.id);
+              .pushNamed(NoteDetailsScreen.routeName, arguments: note);
         },
         splashFactory: NoSplash.splashFactory,
         child: Container(
@@ -54,7 +68,7 @@ class NoteCard extends StatelessWidget {
                 ],
               ),
               Text(
-                DateFormat.d().add_MMM().format(note.date),
+                _getDate(note.date),
                 style: TextStyle(color: Colors.grey),
               ),
             ],

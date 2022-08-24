@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../widgets/note_horizontal_list.dart';
 import '../widgets/my_bottom_app_bar.dart';
 import '../widgets/fade_on_scroll.dart';
-import '../provider/note.dart';
 import '../screens/note_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
