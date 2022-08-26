@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 
-import '../bloc/notes_bloc.dart';
 import '../models/note.dart';
 import '../screens/note_details_screen.dart';
+import '../helpers/datetime_helper.dart';
 
 class NoteCard extends StatelessWidget {
   final Note loadedNote;
@@ -14,18 +13,6 @@ class NoteCard extends StatelessWidget {
   // final DateTime date;
 
   NoteCard(this.loadedNote);
-
-  String _getDate(DateTime date) {
-    final Duration duration = DateTime.now().difference(date);
-    if (duration.inMinutes == 0)
-      return 'just now';
-    else if (duration.inHours == 0)
-      return '${duration.inMinutes} min ago';
-    else if (duration.inDays == 0)
-      return '${duration.inHours} h ago';
-    else
-      return DateFormat.d().add_MMM().format(date);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +55,7 @@ class NoteCard extends StatelessWidget {
                 ],
               ),
               Text(
-                _getDate(note.date),
+                DateTimeHelper.getDate(note.date),
                 style: TextStyle(color: Colors.grey),
               ),
             ],

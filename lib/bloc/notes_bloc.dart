@@ -134,7 +134,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       (event, emit) {
         List<Note> loadedNotes = [];
         if (state is NotesEmptyState) {
-          emit(NotesLoadedState(loadedNotes: []));
+          emit(NotesLoadedState(loadedNotes: loadedNotes));
         } else if (state is NotesLoadedState) {
           final state = this.state as NotesLoadedState;
           loadedNotes = state.loadedNotes;

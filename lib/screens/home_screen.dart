@@ -15,13 +15,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController scrollController = ScrollController();
   String _dayTime = 'morning';
 
-  void checkdayTime() {
+  String checkdayTime() {
     DateTime now = new DateTime.now();
 
-    if (now.hour >= 0 && now.hour < 6) _dayTime = 'night';
-    if (now.hour >= 6 && now.hour < 12) _dayTime = 'morning';
-    if (now.hour >= 12 && now.hour < 18) _dayTime = 'afternon';
-    if (now.hour >= 18 && now.hour < 23) _dayTime = 'evening';
+    if (now.hour >= 0 && now.hour < 6) return 'night';
+    if (now.hour >= 6 && now.hour < 12) return 'morning';
+    if (now.hour >= 12 && now.hour < 18) return 'afternon';
+    if (now.hour >= 18 && now.hour < 23) return 'evening';
+    return 'morning';
   }
 
   @override
@@ -52,7 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
               scrollController: scrollController,
               fullOpacityOffset: 140,
               zeroOpacityOffset: 102,
-              child: Text("Home"),
+              child: Text(
+                "Home",
+                style: TextStyle(color: Colors.black),
+              ),
             ),
             stretchTriggerOffset: 1,
             flexibleSpace: FlexibleSpaceBar(
@@ -64,13 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: RichText(
                   text: TextSpan(children: [
                     TextSpan(
-                        text: 'Good $_dayTime\n',
+                        text: 'Good ${checkdayTime()}\n',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         )),
                     TextSpan(
-                        text: DateFormat.yMMMMEEEEd().format(DateTime.now()),
+                        text: DateFormat.yMMMMEEEEd()
+                            .format(DateTime.now())
+                            .toUpperCase(),
                         style: TextStyle(fontSize: 10)),
                   ]),
                 ),
@@ -100,7 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed(NoteDetailsScreen.routeName);
+                              },
                               icon: const Icon(Icons.note_add_outlined),
                             ),
                             IconButton(

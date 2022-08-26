@@ -6,7 +6,7 @@ import '../models/note.dart';
 import '../widgets/my_bottom_app_bar.dart';
 
 class NoteDetailsScreen extends StatefulWidget {
-  static const routeName = 'note-details';
+  static const routeName = '/note-details';
 
   @override
   State<NoteDetailsScreen> createState() => _NoteDetailsScreenState();
@@ -165,7 +165,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: MyBottomAppBar(),
+        bottomNavigationBar: const MyBottomAppBar(),
         body: Column(
           children: [
             Padding(
