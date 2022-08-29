@@ -50,13 +50,15 @@ class MyApp extends StatelessWidget {
         },
         title: 'Evernote Clone',
         theme: ThemeData(
-            primarySwatch: Colors.green,
-            bottomAppBarColor: Colors.white,
-            appBarTheme: AppBarTheme(
-              color: Colors.white,
-              iconTheme: IconThemeData(color: Colors.black),
-            ),
-            scaffoldBackgroundColor: Colors.white),
+          primarySwatch: Colors.green,
+          bottomAppBarColor: Colors.white,
+          appBarTheme: AppBarTheme(
+            color: Colors.white,
+            iconTheme: IconThemeData(color: Colors.black),
+          ),
+          scaffoldBackgroundColor: Colors.white,
+        ),
+
         home: HomeScreen(),
         // routes: {
         //   NoteDetailsScreen.routeName: (context) => NoteDetailsScreen(),

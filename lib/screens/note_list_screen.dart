@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart';
 
 import '../bloc/notes_bloc.dart';
 import '../helpers/datetime_helper.dart';
+import '../widgets/evernote_drawer.dart';
 import '../widgets/fade_on_scroll.dart';
 import '../widgets/my_bottom_app_bar.dart';
+import '../widgets/note_item.dart';
 import './note_details_screen.dart';
 
-class NoteListScreen extends StatefulWidget {
+class NoteListScreen extends StatelessWidget {
   static const routeName = '/note-list';
 
-  @override
-  State<NoteListScreen> createState() => _NoteListScreenState();
-}
-
-class _NoteListScreenState extends State<NoteListScreen> {
   final ScrollController scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void _openDrawer() {
+    _scaffoldKey.currentState!.openDrawer();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: EvernoteDrawer(),
       body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           if (state is NotesInitialState) {
@@ -28,12 +33,22 @@ class _NoteListScreenState extends State<NoteListScreen> {
             );
           }
           if (state is NotesLoadedState) {
+            state.loadedNotes.sort(
+              (a, b) => b.date.compareTo(a.date),
+            );
             var notes = state.loadedNotes;
             return CustomScrollView(
               controller: scrollController,
               // physics: BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
+                  leading: ModalRoute.of(context)!.canPop
+                      ? BackButton(
+                          color: Theme.of(context).primaryColor,
+                        )
+                      : Container(),
+                  leadingWidth: ModalRoute.of(context)!.canPop ? 56 : 0,
+                  automaticallyImplyLeading: false,
                   elevation: 1,
                   actions: [
                     IconButton(
@@ -81,72 +96,18 @@ class _NoteListScreenState extends State<NoteListScreen> {
                   ),
                 ),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, int index) {
-                      return Container(
-                        child: Card(
-                          elevation: 0,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                  NoteDetailsScreen.routeName,
-                                  arguments: notes[index]);
-                            },
-                            splashFactory: NoSplash.splashFactory,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              height: MediaQuery.of(context).size.height * 0.25,
-                              width: MediaQuery.of(context).size.width,
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 8),
-                                        child: Text(
-                                          notes[index].title,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16),
-                                        ),
-                                      ),
-                                      Text(
-                                        overflow: TextOverflow.ellipsis,
-                                        notes[index].text,
-                                        style: TextStyle(
-                                            color: Colors.grey[700],
-                                            fontSize: 15),
-                                        maxLines: 6,
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    DateTimeHelper.getDate(notes[index].date),
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: notes.length,
+                  delegate: SliverChildListDelegate(
+                    ListTile.divideTiles(
+                      tiles: notes
+                          .map((note) => NoteItem(
+                                key: ValueKey(note.id),
+                                note: note,
+                              ))
+                          .toList(),
+                      context: context,
+                    ).toList(),
                   ),
-                )
+                ),
               ],
             );
           }
@@ -165,7 +126,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
           );
         },
       ),
-      bottomNavigationBar: const MyBottomAppBar(),
+      bottomNavigationBar: MyBottomAppBar(_openDrawer),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

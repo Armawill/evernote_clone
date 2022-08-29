@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/note.dart';
+import '../widgets/evernote_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';
 
 class NoteDetailsScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   bool _isEditing = false;
   bool _wasDelete = false;
   final _form = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   var editedNote = Note(
     id: '',
     title: '',
@@ -127,6 +129,10 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     });
   }
 
+  void _openDrawer() {
+    _scaffoldKey.currentState!.openDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     final Note note;
@@ -145,6 +151,8 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         }
       },
       child: Scaffold(
+        key: _scaffoldKey,
+        drawer: EvernoteDrawer(),
         appBar: AppBar(
           leading: !_isEditing
               ? BackButton(
@@ -165,7 +173,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: const MyBottomAppBar(),
+        bottomNavigationBar: MyBottomAppBar(_openDrawer),
         body: Column(
           children: [
             Padding(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MyBottomAppBar extends StatelessWidget {
-  const MyBottomAppBar({Key? key}) : super(key: key);
+  final VoidCallback openDrawer;
+  MyBottomAppBar(this.openDrawer);
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
@@ -16,7 +17,9 @@ class MyBottomAppBar extends StatelessWidget {
             IconButton(
               tooltip: 'Open navigation menu',
               icon: const Icon(Icons.menu),
-              onPressed: () {},
+              onPressed: () {
+                openDrawer();
+              },
             ),
             IconButton(
               tooltip: 'Search',

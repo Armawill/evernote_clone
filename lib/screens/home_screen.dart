@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/evernote_drawer.dart';
 import '../widgets/note_horizontal_list.dart';
 import '../widgets/my_bottom_app_bar.dart';
 import '../widgets/fade_on_scroll.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String _dayTime = 'morning';
 
   String checkdayTime() {
@@ -31,15 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
   }
 
+  void _openDrawer() {
+    _scaffoldKey.currentState?.openDrawer();
+    print(_scaffoldKey.currentState!.hasDrawer);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const MyBottomAppBar(),
+      key: _scaffoldKey,
+      drawer: EvernoteDrawer(),
+      bottomNavigationBar: MyBottomAppBar(_openDrawer),
       body: CustomScrollView(
         controller: scrollController,
-        physics: BouncingScrollPhysics(),
+        // physics: BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
                 icon: Icon(Icons.dashboard_customize),
@@ -59,31 +69,34 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             stretchTriggerOffset: 1,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 20, bottom: 16),
-              title: FadeOnScroll(
-                scrollController: scrollController,
-                zeroOpacityOffset: 101,
-                fullOpacityOffset: 100,
-                child: RichText(
-                  text: TextSpan(children: [
-                    TextSpan(
-                        text: 'Good ${checkdayTime()}\n',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        )),
-                    TextSpan(
-                        text: DateFormat.yMMMMEEEEd()
-                            .format(DateTime.now())
-                            .toUpperCase(),
-                        style: TextStyle(fontSize: 10)),
-                  ]),
+            flexibleSpace: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: FlexibleSpaceBar(
+                titlePadding: EdgeInsets.only(left: 20, bottom: 16),
+                title: FadeOnScroll(
+                  scrollController: scrollController,
+                  zeroOpacityOffset: 101,
+                  fullOpacityOffset: 100,
+                  child: RichText(
+                    text: TextSpan(children: [
+                      TextSpan(
+                          text: 'Good ${checkdayTime()}\n',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          )),
+                      TextSpan(
+                          text: DateFormat.yMMMMEEEEd()
+                              .format(DateTime.now())
+                              .toUpperCase(),
+                          style: TextStyle(fontSize: 10)),
+                    ]),
+                  ),
                 ),
-              ),
-              background: Image.network(
-                'https://cdn.pixabay.com/photo/2017/10/13/15/29/coffee-2847957_960_720.jpg',
-                fit: BoxFit.cover,
+                background: Image.network(
+                  'https://cdn.pixabay.com/photo/2017/10/13/15/29/coffee-2847957_960_720.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
