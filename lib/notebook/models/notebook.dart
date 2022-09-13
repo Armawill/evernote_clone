@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../note/models/note.dart';
+import '../../note/note.dart';
 
 class Notebook extends Equatable {
   final String id;

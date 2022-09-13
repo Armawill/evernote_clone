@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../note/bloc/notes_bloc.dart';
-import '../note/models/note.dart';
+import '../note/note.dart';
 import '../notebook/bloc/notebooks_bloc.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';

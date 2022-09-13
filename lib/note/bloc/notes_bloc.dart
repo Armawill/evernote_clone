@@ -1,10 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:evernote_clone/repository.dart';
-import 'package:faker/faker.dart';
 
-import '../models/note.dart';
-import '../services/note_provider.dart';
+import '../note.dart';
 
 part 'notes_event.dart';
 part 'notes_state.dart';

@@ -3,8 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../notebook/bloc/notebooks_bloc.dart';
-import '../notebook/models/notebook.dart';
+import '../notebook/notebook.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';
 import './note_details_screen.dart';

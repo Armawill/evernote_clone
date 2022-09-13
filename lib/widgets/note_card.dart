@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'dart:ui' as ui;
 
-import '../note/models/note.dart';
+import '../note/note.dart';
 import '../screens/note_details_screen.dart';
 import '../helpers/datetime_helper.dart';
 
@@ -19,8 +17,8 @@ class NoteCard extends StatelessWidget {
     final note = loadedNote;
     return Card(
       elevation: 5,
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
+      margin: const EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: InkWell(
         onTap: () {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../notebook/bloc/notebooks_bloc.dart';
+import '../notebook/notebook.dart';
 
 class AddNotebookScreen extends StatelessWidget {
   static const routeName = '/add-notebook';

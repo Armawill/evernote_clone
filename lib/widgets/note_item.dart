@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/datetime_helper.dart';
-import '../note/models/note.dart';
+import '../note/note.dart';
 import '../screens/note_details_screen.dart';
 
 class NoteItem extends StatelessWidget {

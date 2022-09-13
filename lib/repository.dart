@@ -1,7 +1,5 @@
-import './notebook/services/notebook_provider.dart';
-import './note/services/note_provider.dart';
-import './note/models/note.dart';
-import './notebook/models/notebook.dart';
+import './note/note.dart';
+import './notebook/notebook.dart';
 
 class Repository {
   final NoteProvider _noteProvider = NoteProvider();

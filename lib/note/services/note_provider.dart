@@ -1,5 +1,5 @@
 import '../../helpers/db_helper.dart';
-import '../models/note.dart';
+import '../note.dart';
 
 class NoteProvider {
   Future<List<Note>> loadNotes() async {

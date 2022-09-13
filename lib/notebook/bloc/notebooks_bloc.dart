@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../note/models/note.dart';
+import '../../note/note.dart';
 import '../../repository.dart';
-import '../models/notebook.dart';
+import '../notebook.dart';
 
 part 'notebooks_event.dart';
 part 'notebooks_state.dart';

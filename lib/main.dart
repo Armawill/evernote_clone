@@ -1,14 +1,12 @@
-import 'package:evernote_clone/notebook/bloc/notebooks_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import './screens/home_screen.dart';
 import './screens/note_details_screen.dart';
-import './note/bloc/notes_bloc.dart';
-import 'note/services/note_provider.dart';
+import './note/note.dart';
 import './screens/note_list_screen.dart';
 import './screens/notebook_list_screen.dart';
-import './notebook/services/notebook_provider.dart';
+import './notebook/notebook.dart';
 import './repository.dart';
 import './screens/add_notebook_screen.dart';
 

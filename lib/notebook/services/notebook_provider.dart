@@ -1,6 +1,6 @@
 import '../../helpers/db_helper.dart';
-import '../../note/models/note.dart';
-import '../models/notebook.dart';
+import '../../note/note.dart';
+import '../notebook.dart';
 
 class NotebookProvider {
   Future<List<Notebook>> fetchNotebooks() async {

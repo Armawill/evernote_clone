@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
-import '../screens/home_screen.dart';
 import '../screens/note_list_screen.dart';
 import '../screens/notebook_list_screen.dart';
 
