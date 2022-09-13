@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/datetime_helper.dart';
-import '../models/note.dart';
+import '../note/models/note.dart';
 import '../screens/note_details_screen.dart';
 
 class NoteItem extends StatelessWidget {
-  const NoteItem({Key? key, required this.note}) : super(key: key);
+  NoteItem(this.note, this._notebookTitle);
   final Note note;
+  final String _notebookTitle;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       key: ValueKey(note.id),
       onTap: () {
-        Navigator.of(context)
-            .pushNamed(NoteDetailsScreen.routeName, arguments: note);
+        Navigator.of(context).pushNamed(
+          NoteDetailsScreen.routeName,
+          arguments: {'note': note, 'notebookTitle': _notebookTitle},
+        );
       },
       title: Container(
         height: MediaQuery.of(context).size.height * 0.25,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../widgets/evernote_drawer.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/note_horizontal_list.dart';
 import '../widgets/my_bottom_app_bar.dart';
 import '../widgets/fade_on_scroll.dart';
@@ -35,15 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _openDrawer() {
     _scaffoldKey.currentState?.openDrawer();
-    print(_scaffoldKey.currentState!.hasDrawer);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: EvernoteDrawer(),
-      bottomNavigationBar: MyBottomAppBar(_openDrawer),
+      drawer: AppDrawer(),
+      bottomNavigationBar: AppBottomAppBar(_openDrawer),
       body: CustomScrollView(
         controller: scrollController,
         // physics: BouncingScrollPhysics(),

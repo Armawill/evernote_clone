@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 
-import '../models/note.dart';
+import '../note/models/note.dart';
 import '../screens/note_details_screen.dart';
 import '../helpers/datetime_helper.dart';
 
@@ -24,8 +24,8 @@ class NoteCard extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: InkWell(
         onTap: () {
-          Navigator.of(context)
-              .pushNamed(NoteDetailsScreen.routeName, arguments: note);
+          Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
+              arguments: {'note': note});
         },
         splashFactory: NoSplash.splashFactory,
         child: Container(

@@ -1,16 +1,17 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:evernote_clone/repository.dart';
 import 'package:faker/faker.dart';
 
 import '../models/note.dart';
-import '../services/note_repository.dart';
+import '../services/note_provider.dart';
 
 part 'notes_event.dart';
 part 'notes_state.dart';
 
 class NotesBloc extends Bloc<NotesEvent, NotesState> {
-  final NoteRepository noteRepository;
-  NotesBloc(this.noteRepository) : super(NotesInitialState()) {
+  final Repository repository;
+  NotesBloc(this.repository) : super(NotesInitialState()) {
     on<NotesLoadEvent>(
       (event, emit) async {
         // var noteList = [
@@ -118,7 +119,8 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         //   ),
         // ];
         try {
-          final loadedNotes = await noteRepository.fetchNotes();
+          await repository.getNotes();
+          var loadedNotes = repository.noteList;
           if (loadedNotes.isEmpty) {
             emit(NotesEmptyState());
           } else {
@@ -142,12 +144,13 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         var noteIndex = loadedNotes.indexWhere(
           (note) => note.id == event.note.id,
         );
-        noteRepository.addNote(event.note);
+        repository.addNote(event.note);
         if (noteIndex >= 0) {
-          loadedNotes[noteIndex] = event.note;
+          //loadedNotes[noteIndex] = event.note;
           emit(
             NotesLoadedState(
-              loadedNotes: loadedNotes,
+              loadedNotes: List.from(loadedNotes)
+                ..replaceRange(noteIndex, noteIndex + 1, [event.note]),
             ),
           );
         } else {
@@ -163,7 +166,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       (event, emit) {
         if (state is NotesLoadedState) {
           final state = this.state as NotesLoadedState;
-          noteRepository.deleteNote(event.note.id);
+          repository.deleteNote(event.note.id);
           emit(
             NotesLoadedState(
               loadedNotes: List.from(state.loadedNotes)..remove(event.note),

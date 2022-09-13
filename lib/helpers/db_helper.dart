@@ -7,11 +7,37 @@ class DBHelper {
     // await sql.deleteDatabase(path.join(dbPath, 'notes.db'));
     return sql.openDatabase(
       path.join(dbPath, 'notes.db'),
-      onCreate: (db, version) {
-        return db.execute(
-            'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT)');
-      },
+      onCreate: _createDb,
       version: 1,
+    );
+  }
+
+  static Future<void> _createDb(sql.Database db, int version) async {
+    await db.execute(
+        'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT)');
+    await db.execute(
+        'CREATE TABLE user_notebooks(id TEXT PRIMARY KEY, title TEXT)');
+    await db.insert(
+      'user_notebooks',
+      {
+        'id': DateTime.now().toString(),
+        'title': 'Interesting',
+      },
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getNotebooks(String table) async {
+    final db = await DBHelper.database();
+    return db.query(table);
+  }
+
+  static Future<List<Map<String, dynamic>>> getNotesForNotebook(
+      String table, String notebook) async {
+    final db = await DBHelper.database();
+    return db.query(
+      table,
+      where: 'notebook = ?',
+      whereArgs: [notebook],
     );
   }
 

@@ -1,9 +1,10 @@
-import 'package:evernote_clone/bloc/notes_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../models/note.dart';
-import '../widgets/evernote_drawer.dart';
+import '../note/bloc/notes_bloc.dart';
+import '../note/models/note.dart';
+import '../notebook/bloc/notebooks_bloc.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';
 
 class NoteDetailsScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     title: '',
     text: '',
     date: DateTime.now(),
+    notebook: 'Interesting',
   );
 
   @override
@@ -44,6 +46,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
 
   void _saveNote(BuildContext ctx) {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
+    var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     editModeOff();
     _form.currentState!.save();
     if (editedNote.title.isEmpty) {
@@ -52,6 +55,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         title: 'Untitled note',
         text: editedNote.text,
         date: editedNote.date,
+        notebook: editedNote.notebook,
       );
     }
     if (editedNote.id.isEmpty) {
@@ -60,6 +64,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         title: editedNote.title,
         text: editedNote.text,
         date: editedNote.date,
+        notebook: editedNote.notebook,
       );
     }
     editedNote = Note(
@@ -67,8 +72,10 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       title: editedNote.title,
       text: editedNote.text,
       date: DateTime.now(),
+      notebook: editedNote.notebook,
     );
     noteBloc.add(AddNoteEvent(editedNote));
+    notebookBloc.add(UpdateNotebookEvent(editedNote, editedNote.notebook));
   }
 
   void _deleteNote(BuildContext ctx) {
@@ -137,8 +144,26 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   Widget build(BuildContext context) {
     final Note note;
     if (ModalRoute.of(context)?.settings.arguments != null) {
-      note = ModalRoute.of(context)!.settings.arguments as Note;
-      editedNote = note;
+      var data =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      var note = data['note'];
+      var nbTitle = data['notebookTitle'];
+      if (note is Note) {
+        editedNote = note;
+      } else {
+        if (nbTitle is String) {
+          if (nbTitle == 'Notes') {
+            nbTitle = 'Interesting';
+          }
+          editedNote = Note(
+            id: editedNote.id,
+            title: editedNote.title,
+            text: editedNote.text,
+            date: editedNote.date,
+            notebook: nbTitle,
+          );
+        }
+      }
     }
 
     return WillPopScope(
@@ -152,7 +177,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: EvernoteDrawer(),
+        drawer: AppDrawer(),
         appBar: AppBar(
           leading: !_isEditing
               ? BackButton(
@@ -173,7 +198,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: MyBottomAppBar(_openDrawer),
+        bottomNavigationBar: AppBottomAppBar(_openDrawer),
         body: Column(
           children: [
             Padding(
@@ -185,7 +210,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     color: Colors.grey[400],
                   ),
                   Text(
-                    'Notebook',
+                    editedNote.notebook,
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                 ],
@@ -211,6 +236,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         title: value!,
                         text: editedNote.text,
                         date: editedNote.date,
+                        notebook: editedNote.notebook,
                       );
                       _focusTitle.unfocus();
                     },
@@ -231,6 +257,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         title: editedNote.title,
                         text: value!,
                         date: editedNote.date,
+                        notebook: editedNote.notebook,
                       );
                       _focusText.unfocus();
                     },

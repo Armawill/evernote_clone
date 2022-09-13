@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/notes_bloc.dart';
+import '../note/bloc/notes_bloc.dart';
 import '../widgets/note_card.dart';
 import './all_note_card.dart';
 

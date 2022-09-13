@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class MyBottomAppBar extends StatelessWidget {
+class AppBottomAppBar extends StatelessWidget {
   final VoidCallback openDrawer;
-  MyBottomAppBar(this.openDrawer);
+  AppBottomAppBar(this.openDrawer);
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(

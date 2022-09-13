@@ -4,8 +4,9 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import '../screens/home_screen.dart';
 import '../screens/note_list_screen.dart';
+import '../screens/notebook_list_screen.dart';
 
-class EvernoteDrawer extends StatelessWidget {
+class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -38,7 +39,10 @@ class EvernoteDrawer extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.book),
                 title: Text('Notebooks'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed(NotebookListScreen.routeName);
+                },
               ),
               ListTile(
                 leading: Icon(Icons.delete),
