@@ -9,6 +9,13 @@ class Notebook extends Equatable {
 
   Notebook({required this.id, required this.title});
 
+  ///Copies values of all feilds
+  Notebook.clone(Notebook source)
+      : id = source.id,
+        title = source.title {
+    noteList.addAll(List.from(source.noteList));
+  }
+
   @override
   // TODO: implement props
   List<Object?> get props => [id, title, noteList];

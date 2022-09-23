@@ -63,14 +63,17 @@ class NotebookListScreen extends StatelessWidget {
             delegate: SliverChildListDelegate([
               BlocBuilder<NotebooksBloc, NotebooksState>(
                 builder: (context, state) {
-                  if (state is NotebooksInitialState) {
+                  final notebooks = state.loadedNotebooks;
+                  if (state.isLoading && notebooks.isEmpty) {
+                    // if (state is NotebooksInitialState) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-                  if (state is NotebooksLoadedState) {
-                    final notebooks = state.loadedNotebooks;
-                    log(state.loadedNotebooks.first.noteList.length.toString());
+                  if (notebooks.isNotEmpty) {
+                    // if (state is NotebooksLoadedState) {
+                    // final notebooks = state.loadedNotebooks;
+                    // log(state.loadedNotebooks.first.noteList.length.toString());
 
                     return Container(
                       height: MediaQuery.of(context).size.height - 130,
@@ -150,11 +153,11 @@ class NotebookListScreen extends StatelessWidget {
                       ),
                     );
                   }
-                  if (state is NotebooksErrorState) {
-                    return Center(
-                      child: Text('Something went wrong'),
-                    );
-                  }
+                  // if (state is NotebooksErrorState) {
+                  //   return Center(
+                  //     child: Text('Something went wrong'),
+                  //   );
+                  // }
                   return Center(
                     child: CircularProgressIndicator(),
                   );

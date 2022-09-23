@@ -12,47 +12,97 @@ part 'notebooks_state.dart';
 
 class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   Repository repository;
-  NotebooksBloc(this.repository) : super(NotebooksInitialState()) {
+  NotebooksBloc(this.repository) : super(NotebooksState()) {
     on<NotebooksLoadEvent>((event, emit) async {
+      emit(state.copyWith(isLoading: true));
       await repository.getNotebooks();
-      emit(NotebooksLoadedState(loadedNotebooks: repository.notebookList));
+      emit(state.copyWith(loadedNotebooks: List.from(repository.notebookList)));
     });
     on<UpdateNotebookEvent>((event, emit) {
-      List<Notebook> loadedNotebooks = [];
-      if (state is NotebooksLoadedState) {
-        final state = this.state as NotebooksLoadedState;
-        loadedNotebooks = state.loadedNotebooks;
+      List<Notebook> notebooks = [];
+      List<Notebook> temp = List.from(state.loadedNotebooks);
+      for (int i = 0; i < temp.length; i++) {
+        notebooks.add(Notebook.clone(temp[i]));
+      }
 
-        var index = loadedNotebooks.indexWhere(
-          (nb) => nb.title == event.notebookName,
-        );
-        if (index >= 0) {
-          var noteIndex = repository.notebookList[index].noteList
-              .indexWhere((note) => note.id == event.note.id);
-          if (noteIndex >= 0) {
-            repository.notebookList
-                .elementAt(index)
-                .noteList
-                .replaceRange(noteIndex, noteIndex + 1, [event.note]);
-            loadedNotebooks = List.from(repository.notebookList);
-          } else {
-            loadedNotebooks = List.from(repository.notebookList
-              ..elementAt(index).noteList.add(event.note));
-          }
-          log('${state.loadedNotebooks == loadedNotebooks}');
+      var index = notebooks.indexWhere(
+        (nb) => nb.title == event.notebookName,
+      );
 
-          emit(NotebooksUpdatedState());
-          emit(NotebooksLoadedState(loadedNotebooks: loadedNotebooks));
+      if (index >= 0) {
+        var noteIndex = notebooks[index]
+            .noteList
+            .indexWhere((note) => note.id == event.note.id);
+        if (noteIndex >= 0) {
+          notebooks
+              .elementAt(index)
+              .noteList
+              .replaceRange(noteIndex, noteIndex + 1, [event.note]);
+        } else {
+          notebooks[index].noteList.add(event.note);
         }
+        emit(state.copyWith(loadedNotebooks: notebooks));
       }
     });
     on<AddNotebookEvent>((event, emit) {
       var newNotebook =
           Notebook(id: DateTime.now().toString(), title: event.title);
-      repository.addNotebook(newNotebook);
-      emit(NotebooksLoadedState(
+      emit(state.copyWith(
           loadedNotebooks: List.from(repository.notebookList)
             ..add(newNotebook)));
     });
   }
 }
+
+// class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
+//   Repository repository;
+//   NotebooksBloc(this.repository) : super(NotebooksInitialState()) {
+//     on<NotebooksLoadEvent>((event, emit) async {
+//       await repository.getNotebooks();
+//       emit(NotebooksLoadedState(loadedNotebooks: repository.notebookList));
+//     });
+//     on<UpdateNotebookEvent>((event, emit) {
+//       List<Notebook> loadedNotebooks = [];
+//       if (state is NotebooksLoadedState) {
+//         final state = this.state as NotebooksLoadedState;
+//         loadedNotebooks = List.from(state.loadedNotebooks);
+
+//         var index = loadedNotebooks.indexWhere(
+//           (nb) => nb.title == event.notebookName,
+//         );
+//         if (index >= 0) {
+//           var noteIndex = repository.notebookList[index].noteList
+//               .indexWhere((note) => note.id == event.note.id);
+//           if (noteIndex >= 0) {
+//             repository.notebookList
+//                 .elementAt(index)
+//                 .noteList
+//                 .replaceRange(noteIndex, noteIndex + 1, [event.note]);
+//             loadedNotebooks = List.from(repository.notebookList);
+//           } else {
+//             loadedNotebooks = List.from(repository.notebookList
+//               ..elementAt(index).noteList.add(event.note));
+//           }
+//           log('repository.notebookList.first.noteList.length: ${repository.notebookList.first.noteList.length}');
+//           log('state.loadedNotebooks.first.noteList.length: ${state.loadedNotebooks.first.noteList.length}');
+//           log('notebooks.first.noteList.length: ${loadedNotebooks.first.noteList.length}');
+//           // log('temp.first.noteList.length: ${temp.first.noteList.length}');
+//           log('${state.loadedNotebooks == loadedNotebooks}');
+//           log('${repository.notebookList == loadedNotebooks}');
+
+//           //emit(NotebooksUpdatedState());
+//           emit(NotebooksLoadedState(
+//               loadedNotebooks: List.from(loadedNotebooks)));
+//         }
+//       }
+//     });
+//     on<AddNotebookEvent>((event, emit) {
+//       var newNotebook =
+//           Notebook(id: DateTime.now().toString(), title: event.title);
+//       repository.addNotebook(newNotebook);
+//       emit(NotebooksLoadedState(
+//           loadedNotebooks: List.from(repository.notebookList)
+//             ..add(newNotebook)));
+//     });
+//   }
+// }

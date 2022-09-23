@@ -20,19 +20,6 @@ class Repository {
 
   Future<void> addNote(Note editedNote) async {
     await _noteProvider.addNote(editedNote);
-
-    // final nbIndex = notebookList
-    //     .indexWhere((notebook) => notebook.title == editedNote.notebook);
-    // if (nbIndex >= 0) {
-    //   final noteIndex = notebookList[nbIndex]
-    //       .noteList
-    //       .indexWhere((note) => note.id == editedNote.id);
-    //   if (noteIndex >= 0) {
-    //     notebookList[nbIndex].noteList[noteIndex] = editedNote;
-    //   } else {
-    //     notebookList[nbIndex].noteList.add(editedNote);
-    //   }
-    // }
   }
 
   Future<void> deleteNote(String id) async {
