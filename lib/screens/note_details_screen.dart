@@ -74,15 +74,18 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       notebook: editedNote.notebook,
     );
     noteBloc.add(AddNoteEvent(editedNote));
-    notebookBloc.add(UpdateNotebookEvent(editedNote, editedNote.notebook));
+    notebookBloc.add(AddNoteToNotebookEvent(editedNote, editedNote.notebook));
   }
 
   void _deleteNote(BuildContext ctx) {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
+    var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     setState(() {
       _wasDelete = true;
     });
     noteBloc.add(AddToTrashEvent(editedNote));
+    notebookBloc
+        .add(RemoveNoteFromNotebookEvent(editedNote, editedNote.notebook));
   }
 
   void editModeOn() {

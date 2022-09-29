@@ -9,14 +9,23 @@ abstract class NotebookEvent extends Equatable {
 
 class NotebooksLoadEvent extends NotebookEvent {}
 
-class UpdateNotebookEvent extends NotebookEvent {
+class AddNoteToNotebookEvent extends NotebookEvent {
   final Note note;
   final String notebookName;
 
-  const UpdateNotebookEvent(this.note, this.notebookName);
+  const AddNoteToNotebookEvent(this.note, this.notebookName);
 
   @override
-  // TODO: implement props
+  List<Object> get props => [note, notebookName];
+}
+
+class RemoveNoteFromNotebookEvent extends NotebookEvent {
+  final Note note;
+  final String notebookName;
+
+  const RemoveNoteFromNotebookEvent(this.note, this.notebookName);
+
+  @override
   List<Object> get props => [note, notebookName];
 }
 
@@ -26,7 +35,6 @@ class AddNotebookEvent extends NotebookEvent {
   const AddNotebookEvent(this.title);
 
   @override
-  // TODO: implement props
   List<Object> get props => [title];
 }
 
