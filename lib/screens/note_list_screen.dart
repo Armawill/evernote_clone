@@ -12,6 +12,7 @@ import '../widgets/note_item.dart';
 import './note_details_screen.dart';
 
 const TRASH = 'Trash';
+const NOTES = 'Notes';
 
 class NoteListScreen extends StatelessWidget {
   static const routeName = '/note-list';
@@ -96,8 +97,9 @@ class NoteListScreen extends StatelessWidget {
     try {
       notebook = ModalRoute.of(context)!.settings.arguments as String;
     } catch (err) {
-      notebook = 'Notes';
+      notebook = NOTES;
     }
+    context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
 
     return Scaffold(
       key: _scaffoldKey,
@@ -113,23 +115,7 @@ class NoteListScreen extends StatelessWidget {
           }
           if ((state.isNoteListNotEmpty && notebook != TRASH) ||
               (state.isTrashListNotEmpty && notebook == TRASH)) {
-            log('NoteLoadedState');
-            List<Note> notes;
-            if (notebook == 'Trash') {
-              notes = state.trashNotesList;
-            } else if (notebook != 'Notes') {
-              notes = state.loadedNotes
-                  .where((note) => note.notebook == notebook)
-                  .toList();
-              // var nbIndex = context
-              //     .read<Repository>()
-              //     .notebookList
-              //     .indexWhere((nb) => nb.title == notebook);
-              // notes = context.read<Repository>().notebookList[nbIndex].noteList;
-            } else {
-              notes = state.loadedNotes;
-            }
-
+            List<Note> notes = state.loadedNotes;
             notes.sort(
               (a, b) => b.date.compareTo(a.date),
             );
@@ -156,9 +142,50 @@ class NoteListScreen extends StatelessWidget {
               (state.isTrashListEmpty && notebook == TRASH)) {
             return _buildCustomScrollView(
                 context: context,
-                child: const SliverFillRemaining(
-                  child: Center(
-                    child: Text('No notes yet'),
+                child: SliverFillRemaining(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => Column(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: constraints.maxHeight * 0.15),
+                          child: Image.asset(
+                            'assets/images/empty_note_list.png',
+                            fit: BoxFit.cover,
+                            height: constraints.maxHeight * 0.25,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        const Text(
+                          'No notes yet',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: constraints.maxWidth * 0.6,
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16),
+                              children: [
+                                const TextSpan(text: 'Tap the '),
+                                TextSpan(
+                                    text: '+ New',
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor)),
+                                const TextSpan(
+                                    text: ' button to create a note'),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 notes: [],

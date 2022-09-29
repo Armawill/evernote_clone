@@ -59,7 +59,6 @@ class NoteProvider {
   void addToTrash(Note note) {
     note.date = DateTime.now();
     note.isInTrash = true;
-    note.notebook = 'Trash';
     addNote(note);
   }
 }

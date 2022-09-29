@@ -17,6 +17,14 @@ class Note extends Equatable {
     this.isInTrash = false,
   });
 
+  Note.empty()
+      : id = '',
+        title = '',
+        text = '',
+        date = DateTime.now(),
+        notebook = 'Interesting',
+        isInTrash = false;
+
   @override
   // TODO: implement props
   List<Object?> get props => [id, title, text, date, notebook, isInTrash];

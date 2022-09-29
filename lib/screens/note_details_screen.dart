@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,6 +8,8 @@ import '../note/note.dart';
 import '../notebook/bloc/notebooks_bloc.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';
+
+const TRASH = 'Trash';
 
 class NoteDetailsScreen extends StatefulWidget {
   static const routeName = '/note-details';
@@ -19,28 +24,21 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   bool _isEditing = false;
   bool _wasDelete = false;
   final _form = GlobalKey<FormState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  var editedNote = Note(
-    id: '',
-    title: '',
-    text: '',
-    date: DateTime.now(),
-    notebook: 'Interesting',
-  );
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  var _editedNote = Note.empty();
 
   @override
   void initState() {
     super.initState();
-
     _focusText = FocusNode();
     _focusTitle = FocusNode();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _focusTitle.dispose();
     _focusText.dispose();
+    super.dispose();
   }
 
   void _saveNote(BuildContext ctx) {
@@ -48,33 +46,9 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     editModeOff();
     _form.currentState!.save();
-    if (editedNote.title.isEmpty) {
-      editedNote = Note(
-        id: editedNote.id,
-        title: 'Untitled note',
-        text: editedNote.text,
-        date: editedNote.date,
-        notebook: editedNote.notebook,
-      );
-    }
-    if (editedNote.id.isEmpty) {
-      editedNote = Note(
-        id: DateTime.now().toString(),
-        title: editedNote.title,
-        text: editedNote.text,
-        date: editedNote.date,
-        notebook: editedNote.notebook,
-      );
-    }
-    editedNote = Note(
-      id: editedNote.id,
-      title: editedNote.title,
-      text: editedNote.text,
-      date: DateTime.now(),
-      notebook: editedNote.notebook,
-    );
-    noteBloc.add(AddNoteEvent(editedNote));
-    notebookBloc.add(AddNoteToNotebookEvent(editedNote, editedNote.notebook));
+    _editedNote.date = DateTime.now();
+    noteBloc.add(AddNoteEvent(_editedNote));
+    notebookBloc.add(AddNoteToNotebookEvent(_editedNote, _editedNote.notebook));
   }
 
   void _deleteNote(BuildContext ctx) {
@@ -83,9 +57,18 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     setState(() {
       _wasDelete = true;
     });
-    noteBloc.add(AddToTrashEvent(editedNote));
+    noteBloc.add(RemoveNoteEvent(_editedNote));
+  }
+
+  void _moveNoteToTrash(BuildContext ctx) {
+    var noteBloc = BlocProvider.of<NotesBloc>(ctx);
+    var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
+    setState(() {
+      _wasDelete = true;
+    });
+    noteBloc.add(AddToTrashEvent(_editedNote));
     notebookBloc
-        .add(RemoveNoteFromNotebookEvent(editedNote, editedNote.notebook));
+        .add(RemoveNoteFromNotebookEvent(_editedNote, _editedNote.notebook));
   }
 
   void editModeOn() {
@@ -100,37 +83,67 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     });
   }
 
-  void showMoreActions() {
+  void showMoreActions(bool isNoteInTrash) {
     showModalBottomSheet(
         context: context,
         builder: (_) {
-          return GestureDetector(
-            onTap: () {},
-            behavior: HitTestBehavior.opaque,
-            child: Column(
-              children: [
-                InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(width: 15),
-                        Text(
-                          'Delete',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
+          if (isNoteInTrash) {
+            return GestureDetector(
+              onTap: () {},
+              behavior: HitTestBehavior.opaque,
+              child: Column(
+                children: [
+                  InkWell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete),
+                          SizedBox(width: 15),
+                          Text(
+                            'Delete note forever',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
+                    onTap: () {
+                      _deleteNote(context);
+                      Navigator.pop(context);
+                    },
                   ),
-                  onTap: () {
-                    _deleteNote(context);
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          );
+                ],
+              ),
+            );
+          } else {
+            return GestureDetector(
+              onTap: () {},
+              behavior: HitTestBehavior.opaque,
+              child: Column(
+                children: [
+                  InkWell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete),
+                          SizedBox(width: 15),
+                          Text(
+                            'Move to trash',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      _moveNoteToTrash(context);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
         }).then((_) {
       if (_wasDelete) {
         Navigator.pop(context);
@@ -151,17 +164,18 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       var note = data['note'];
       var nbTitle = data['notebookTitle'];
       if (note is Note) {
-        editedNote = note;
+        _editedNote = note;
       } else {
         if (nbTitle is String) {
-          if (nbTitle == 'Notes') {
-            nbTitle = 'Interesting';
-          }
-          editedNote = Note(
-            id: editedNote.id,
-            title: editedNote.title,
-            text: editedNote.text,
-            date: editedNote.date,
+          // if (nbTitle == 'Notes') {
+          //   nbTitle = 'Interesting';
+          // }
+          log('nbTitle $nbTitle');
+          _editedNote = Note(
+            id: _editedNote.id,
+            title: _editedNote.title,
+            text: _editedNote.text,
+            date: _editedNote.date,
             notebook: nbTitle,
           );
         }
@@ -195,7 +209,9 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           elevation: 0,
           actions: [
             IconButton(
-              onPressed: showMoreActions,
+              onPressed: () {
+                showMoreActions(_editedNote.isInTrash);
+              },
               icon: Icon(Icons.more_horiz),
             ),
           ],
@@ -208,11 +224,13 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
               child: Row(
                 children: [
                   Icon(
-                    Icons.book,
+                    _editedNote.isInTrash
+                        ? Icons.delete
+                        : CustomIcons.notebook_filled,
                     color: Colors.grey[400],
                   ),
                   Text(
-                    editedNote.notebook,
+                    _editedNote.isInTrash ? TRASH : _editedNote.notebook,
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                 ],
@@ -223,7 +241,8 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
               child: Column(
                 children: [
                   TextFormField(
-                    initialValue: editedNote.title,
+                    enabled: _editedNote.isInTrash ? false : true,
+                    initialValue: _editedNote.title,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     decoration: InputDecoration(
                       hintText: 'Title',
@@ -233,12 +252,12 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                     ),
                     onSaved: (value) {
-                      editedNote = Note(
-                        id: editedNote.id,
+                      _editedNote = Note(
+                        id: _editedNote.id,
                         title: value!,
-                        text: editedNote.text,
-                        date: editedNote.date,
-                        notebook: editedNote.notebook,
+                        text: _editedNote.text,
+                        date: _editedNote.date,
+                        notebook: _editedNote.notebook,
                       );
                       _focusTitle.unfocus();
                     },
@@ -246,7 +265,8 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     focusNode: _focusTitle,
                   ),
                   TextFormField(
-                    initialValue: editedNote.text,
+                    enabled: _editedNote.isInTrash ? false : true,
+                    initialValue: _editedNote.text,
                     decoration: InputDecoration(
                       hintText: 'Start writing',
                       border: OutlineInputBorder(borderSide: BorderSide.none),
@@ -254,12 +274,12 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     maxLines: null,
                     focusNode: _focusText,
                     onSaved: (value) {
-                      editedNote = Note(
-                        id: editedNote.id,
-                        title: editedNote.title,
+                      _editedNote = Note(
+                        id: _editedNote.id,
+                        title: _editedNote.title,
                         text: value!,
-                        date: editedNote.date,
-                        notebook: editedNote.notebook,
+                        date: _editedNote.date,
+                        notebook: _editedNote.notebook,
                       );
                       _focusText.unfocus();
                     },
@@ -274,14 +294,22 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         floatingActionButton: Visibility(
           visible: !_isEditing,
           child: FloatingActionButton.extended(
-            onPressed: () {
-              editModeOn();
-              _focusText.requestFocus();
-            },
-            backgroundColor: Colors.blue[700],
+            onPressed: _editedNote.isInTrash
+                ? null
+                : () {
+                    editModeOn();
+                    _focusText.requestFocus();
+                  },
+            backgroundColor:
+                _editedNote.isInTrash ? Colors.grey[300] : Colors.blue[700],
+            foregroundColor:
+                _editedNote.isInTrash ? Colors.grey[600] : Colors.white,
             elevation: 0,
-            icon: const Icon(Icons.edit),
-            label: Text('Edit'),
+            icon: _editedNote.isInTrash
+                ? const Icon(Icons.remove_red_eye_outlined)
+                : Icon(Icons.edit),
+            label:
+                _editedNote.isInTrash ? const Text('View only') : Text('Edit'),
           ),
         ),
       ),

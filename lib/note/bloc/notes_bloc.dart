@@ -16,6 +16,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<AddNoteEvent>(_onNoteAdded);
     on<RemoveNoteEvent>(_onNoteRemoved);
     on<AddToTrashEvent>(_onToTrashAdded);
+    on<ShowNotesFromNotebook>(_onNotesFromNotebookShowed);
   }
 
   Future<void> _onNotesLoaded(
@@ -37,8 +38,14 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   }
 
   void _onNoteAdded(AddNoteEvent event, Emitter<NotesState> emit) {
-    List<Note> loadedNotes = [];
-    loadedNotes = List.from(state.loadedNotes);
+    List<Note> loadedNotes = List.from(state.loadedNotes);
+    if (event.note.title.isEmpty) {
+      event.note.title = 'Untitled note';
+    }
+    if (event.note.id.isEmpty) {
+      event.note.id.replaceRange(
+          0, null, DateTime.now().toString()); //id is a final variable
+    }
 
     var noteIndex = loadedNotes.indexWhere(
       (note) => note.id == event.note.id,
@@ -83,6 +90,20 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           ),
       ),
     );
+  }
+
+  void _onNotesFromNotebookShowed(
+      ShowNotesFromNotebook event, Emitter<NotesState> emit) {
+    if (event.notebookTitle == 'Notes') {
+      emit(state.copyWith(loadedNotes: List.from(repository.noteList)));
+    } else if (event.notebookTitle == 'Trash') {
+      emit(state.copyWith(loadedNotes: List.from(repository.trashList)));
+    } else {
+      var nbIndex = repository.notebookList
+          .indexWhere((nb) => nb.title == event.notebookTitle);
+      emit(state.copyWith(
+          loadedNotes: List.from(repository.notebookList[nbIndex].noteList)));
+    }
   }
 }
 

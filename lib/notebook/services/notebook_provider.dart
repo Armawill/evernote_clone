@@ -16,14 +16,18 @@ class NotebookProvider {
         final data = await DBHelper.getNotesForNotebook(
             'user_notes', notebooksLoaded[i].title);
         final noteList = data
-            .map((note) => Note(
-                  id: note['id'],
-                  title: note['title'],
-                  text: note['text'],
-                  date: DateTime.parse(note['date']),
-                  notebook: note['notebook'],
-                ))
+            .map(
+              (note) => Note(
+                id: note['id'],
+                title: note['title'],
+                text: note['text'],
+                date: DateTime.parse(note['date']),
+                notebook: note['notebook'],
+                isInTrash: note['isInTrash'] == 0 ? false : true,
+              ),
+            )
             .toList();
+        noteList.removeWhere((note) => note.isInTrash);
 
         notebooksLoaded[i].noteList.addAll(noteList);
       }

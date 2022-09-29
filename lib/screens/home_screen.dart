@@ -1,3 +1,4 @@
+import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -124,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.of(context)
                                       .pushNamed(NoteDetailsScreen.routeName);
                                 },
-                                icon: const Icon(Icons.note_add_outlined),
+                                icon: const Icon(CustomIcons.add_note_outlined),
                               ),
                               IconButton(
                                 onPressed: () {},

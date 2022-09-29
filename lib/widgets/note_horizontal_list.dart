@@ -8,20 +8,14 @@ import './all_note_card.dart';
 class NoteHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // var notesData = Provider.of<Notes>(context);
-    // var notes = notesData.notes;
-    // int notesLength = notes.length;
-    // if (notes.length > 11) {
-    //   notesLength = 11;
-    // }
-
+    context.read<NotesBloc>().add(const ShowNotesFromNotebook('Notes'));
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.3,
       child: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           if (state.isLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -47,7 +41,7 @@ class NoteHorizontalList extends StatelessWidget {
             );
           }
           if (state.isNoteListEmpty) {
-            return Center(
+            return const Center(
               child: Text('No notes yet'),
             );
           }
@@ -56,7 +50,7 @@ class NoteHorizontalList extends StatelessWidget {
           //     child: Text('Something went wrong'),
           //   );
           // }
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         },

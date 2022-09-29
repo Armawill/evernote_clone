@@ -36,6 +36,7 @@ class Repository {
 
   Future<void> deleteNote(String id) async {
     await _noteProvider.deleteNote(id);
+    trashList.removeWhere((note) => note.id == id);
   }
 
   Future<void> addNotebook(Notebook notebook) async {

@@ -35,3 +35,12 @@ class AddToTrashEvent extends NotesEvent {
   @override
   List<Object> get props => [note];
 }
+
+class ShowNotesFromNotebook extends NotesEvent {
+  final String notebookTitle;
+
+  const ShowNotesFromNotebook(this.notebookTitle);
+
+  @override
+  List<Object> get props => [notebookTitle];
+}

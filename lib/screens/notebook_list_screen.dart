@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -40,7 +41,7 @@ class NotebookListScreen extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.bookmark_add),
+                icon: Icon(CustomIcons.add_notebook_filled),
               ),
               IconButton(
                 onPressed: () {},
@@ -105,7 +106,7 @@ class NotebookListScreen extends StatelessWidget {
                                           height: 50,
                                           child: Row(
                                             children: [
-                                              Icon(Icons.book),
+                                              Icon(CustomIcons.notebook_filled),
                                               RichText(
                                                 text: TextSpan(children: [
                                                   TextSpan(
@@ -138,7 +139,8 @@ class NotebookListScreen extends StatelessWidget {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(left: 7),
-                                    child: Icon(Icons.bookmark_add),
+                                    child:
+                                        Icon(CustomIcons.add_notebook_filled),
                                   ),
                                   Text(
                                     'New notebook',
@@ -159,7 +161,7 @@ class NotebookListScreen extends StatelessWidget {
                   //   );
                   // }
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: Text('Something went wrong'),
                   );
                 },
               ),
