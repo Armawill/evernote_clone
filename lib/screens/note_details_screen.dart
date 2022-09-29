@@ -82,7 +82,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     setState(() {
       _wasDelete = true;
     });
-    noteBloc.add(RemoveNoteEvent(editedNote));
+    noteBloc.add(AddToTrashEvent(editedNote));
   }
 
   void editModeOn() {

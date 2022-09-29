@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../helpers/db_helper.dart';
 import '../note.dart';
 
@@ -16,6 +18,7 @@ class NoteProvider {
               text: note['text'],
               date: DateTime.parse(note['date']),
               notebook: note['notebook'],
+              isInTrash: note['isInTrash'] == 0 ? false : true,
             ))
         .toList();
     if (noteList.isNotEmpty)
@@ -35,6 +38,7 @@ class NoteProvider {
           'text': note.text,
           'date': note.date.toIso8601String(),
           'notebook': note.notebook,
+          'isInTrash': note.isInTrash ? 1 : 0,
         },
       );
     } catch (err) {
@@ -50,5 +54,12 @@ class NoteProvider {
       print(err);
       throw (err);
     }
+  }
+
+  void addToTrash(Note note) {
+    note.date = DateTime.now();
+    note.isInTrash = true;
+    note.notebook = 'Trash';
+    addNote(note);
   }
 }

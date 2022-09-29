@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:evernote_clone/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,11 +11,13 @@ import '../widgets/my_bottom_app_bar.dart';
 import '../widgets/note_item.dart';
 import './note_details_screen.dart';
 
+const TRASH = 'Trash';
+
 class NoteListScreen extends StatelessWidget {
   static const routeName = '/note-list';
 
   final ScrollController scrollController = ScrollController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _openDrawer() {
     _scaffoldKey.currentState!.openDrawer();
@@ -26,7 +31,6 @@ class NoteListScreen extends StatelessWidget {
   }) {
     return CustomScrollView(
       controller: scrollController,
-      // physics: BouncingScrollPhysics(),
       slivers: [
         SliverAppBar(
           leading: ModalRoute.of(context)!.canPop
@@ -40,15 +44,14 @@ class NoteListScreen extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () {},
-              icon: Icon(Icons.more_horiz),
+              icon: const Icon(Icons.more_horiz),
             ),
           ],
           title: FadeOnScroll(
             child: Text(
               notebook,
-              style: TextStyle(
-                color: Colors.black,
-              ),
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),
             ),
             scrollController: scrollController,
             fullOpacityOffset: 40,
@@ -58,7 +61,7 @@ class NoteListScreen extends StatelessWidget {
           pinned: true,
           flexibleSpace: FlexibleSpaceBar(
             expandedTitleScale: 1.0,
-            titlePadding: EdgeInsets.only(left: 20, bottom: 16),
+            titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
             title: FadeOnScroll(
               scrollController: scrollController,
               fullOpacityOffset: 25,
@@ -68,13 +71,14 @@ class NoteListScreen extends StatelessWidget {
                   children: [
                     TextSpan(
                         text: notebook,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
                             color: Colors.black)),
                     TextSpan(
                         text: notes.isNotEmpty ? ' (${notes.length})' : '',
-                        style: TextStyle(fontSize: 18, color: Colors.grey)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.grey)),
                   ],
                 ),
               ),
@@ -100,25 +104,35 @@ class NoteListScreen extends StatelessWidget {
       drawer: AppDrawer(),
       body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
-          if (state is NotesInitialState) {
-            return SliverFillRemaining(
+          if (state.isLoading) {
+            return const SliverFillRemaining(
               child: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
-          if (state is NotesLoadedState) {
-            state.loadedNotes.sort(
-              (a, b) => b.date.compareTo(a.date),
-            );
+          if ((state.isNoteListNotEmpty && notebook != TRASH) ||
+              (state.isTrashListNotEmpty && notebook == TRASH)) {
+            log('NoteLoadedState');
             List<Note> notes;
-            if (notebook != 'Notes') {
+            if (notebook == 'Trash') {
+              notes = state.trashNotesList;
+            } else if (notebook != 'Notes') {
               notes = state.loadedNotes
                   .where((note) => note.notebook == notebook)
                   .toList();
+              // var nbIndex = context
+              //     .read<Repository>()
+              //     .notebookList
+              //     .indexWhere((nb) => nb.title == notebook);
+              // notes = context.read<Repository>().notebookList[nbIndex].noteList;
             } else {
               notes = state.loadedNotes;
             }
+
+            notes.sort(
+              (a, b) => b.date.compareTo(a.date),
+            );
 
             return _buildCustomScrollView(
                 context: context,
@@ -138,10 +152,11 @@ class NoteListScreen extends StatelessWidget {
                 notes: notes,
                 notebook: notebook);
           }
-          if (state is NotesEmptyState) {
+          if ((state.isNoteListEmpty && notebook != TRASH) ||
+              (state.isTrashListEmpty && notebook == TRASH)) {
             return _buildCustomScrollView(
                 context: context,
-                child: SliverFillRemaining(
+                child: const SliverFillRemaining(
                   child: Center(
                     child: Text('No notes yet'),
                   ),
@@ -149,20 +164,20 @@ class NoteListScreen extends StatelessWidget {
                 notes: [],
                 notebook: notebook);
           }
-          if (state is NotesErrorState) {
-            return _buildCustomScrollView(
-                context: context,
-                child: SliverFillRemaining(
-                  child: Center(
-                    child: Text('Something went wrong'),
-                  ),
-                ),
-                notes: [],
-                notebook: notebook);
-          }
+          // if (state is NotesErrorState) {
+          //   return _buildCustomScrollView(
+          //       context: context,
+          //       child: const SliverFillRemaining(
+          //         child: Center(
+          //           child: Text('Something went wrong'),
+          //         ),
+          //       ),
+          //       notes: [],
+          //       notebook: notebook);
+          // }
           return _buildCustomScrollView(
               context: context,
-              child: SliverFillRemaining(
+              child: const SliverFillRemaining(
                 child: Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -181,7 +196,7 @@ class NoteListScreen extends StatelessWidget {
         elevation: 0,
         tooltip: 'Add note',
         icon: const Icon(Icons.add),
-        label: Text('New'),
+        label: const Text('New'),
       ),
     );
   }

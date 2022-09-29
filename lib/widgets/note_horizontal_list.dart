@@ -20,12 +20,12 @@ class NoteHorizontalList extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.3,
       child: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
-          if (state is NotesInitialState) {
+          if (state.isLoading) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (state is NotesLoadedState) {
+          if (state.isNoteListNotEmpty) {
             state.loadedNotes.sort(
               (a, b) => b.date.compareTo(a.date),
             );
@@ -46,16 +46,16 @@ class NoteHorizontalList extends StatelessWidget {
               },
             );
           }
-          if (state is NotesEmptyState) {
+          if (state.isNoteListEmpty) {
             return Center(
               child: Text('No notes yet'),
             );
           }
-          if (state is NotesErrorState) {
-            return Center(
-              child: Text('Something went wrong'),
-            );
-          }
+          // if (state is NotesErrorState) {
+          //   return Center(
+          //     child: Text('Something went wrong'),
+          //   );
+          // }
           return Center(
             child: CircularProgressIndicator(),
           );

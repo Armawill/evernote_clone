@@ -8,13 +8,20 @@ class DBHelper {
     return sql.openDatabase(
       path.join(dbPath, 'notes.db'),
       onCreate: _createDb,
+      onOpen: _openDB,
       version: 1,
     );
   }
 
+  static Future<void> _openDB(sql.Database db) async {
+    // await db.execute('DROP TABLE user_notes');
+    // db.execute(
+    //     'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT, isInTrash INTEGER)');
+  }
+
   static Future<void> _createDb(sql.Database db, int version) async {
     await db.execute(
-        'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT)');
+        'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT, isInTrash INTEGER)');
     await db.execute(
         'CREATE TABLE user_notebooks(id TEXT PRIMARY KEY, title TEXT)');
     await db.insert(

@@ -44,7 +44,11 @@ class AppDrawer extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.delete),
                 title: Text('Trash'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed(
+                      NoteListScreen.routeName,
+                      arguments: 'Trash');
+                },
               ),
             ],
           ).toList(),

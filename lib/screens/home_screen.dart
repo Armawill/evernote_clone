@@ -68,8 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             stretchTriggerOffset: 1,
-            flexibleSpace: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            flexibleSpace: SafeArea(
               child: FlexibleSpaceBar(
                 titlePadding: EdgeInsets.only(left: 20, bottom: 16),
                 title: FadeOnScroll(
@@ -95,45 +94,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 background: Image.network(
                   'https://cdn.pixabay.com/photo/2017/10/13/15/29/coffee-2847957_960_720.jpg',
                   fit: BoxFit.cover,
+                  colorBlendMode: BlendMode.multiply,
+                  color: Colors.grey[400],
                 ),
               ),
             ),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
-              Container(
-                height: 850,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Text(
-                            'NOTES >',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+              SafeArea(
+                child: Container(
+                  height: 850,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Text(
+                              'NOTES >',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pushNamed(NoteDetailsScreen.routeName);
-                              },
-                              icon: const Icon(Icons.note_add_outlined),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.more_horiz),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    NoteHorizontalList(),
-                  ],
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed(NoteDetailsScreen.routeName);
+                                },
+                                icon: const Icon(Icons.note_add_outlined),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.more_horiz),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      NoteHorizontalList(),
+                    ],
+                  ),
                 ),
               ),
             ]),

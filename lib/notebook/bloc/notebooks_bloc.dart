@@ -17,6 +17,9 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
       emit(state.copyWith(isLoading: true));
       await repository.getNotebooks();
       emit(state.copyWith(loadedNotebooks: List.from(repository.notebookList)));
+      repository.notebookList[0].noteList.forEach(
+        (note) => log('${note.title} ${note.notebook}'),
+      );
     });
     on<UpdateNotebookEvent>((event, emit) {
       List<Notebook> notebooks = [];
