@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../note/note.dart';
@@ -83,67 +84,108 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     });
   }
 
-  void showMoreActions(bool isNoteInTrash) {
+  Widget _trashModalBottomSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            Icons.find_in_page_outlined,
+          ),
+          title: Text(
+            'Find in note',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.restart_alt,
+          ),
+          title: Text(
+            'Restore',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
+          title: Text(
+            'Delete note forever',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.red,
+            ),
+          ),
+          onTap: () {
+            _deleteNote(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _noteModalBottomSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            Icons.find_in_page_outlined,
+          ),
+          title: Text(
+            'Find in note',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
+          title: Text(
+            'Move to trash',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.red,
+            ),
+          ),
+          onTap: () {
+            _moveNoteToTrash(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  void showMoreActions(BuildContext ctx, bool isNoteInTrash) {
     showModalBottomSheet(
-        context: context,
+        context: ctx,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.75,
+        ),
         builder: (_) {
-          if (isNoteInTrash) {
-            return GestureDetector(
-              onTap: () {},
-              behavior: HitTestBehavior.opaque,
-              child: Column(
-                children: [
-                  InkWell(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete),
-                          SizedBox(width: 15),
-                          Text(
-                            'Delete note forever',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      _deleteNote(context);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return GestureDetector(
-              onTap: () {},
-              behavior: HitTestBehavior.opaque,
-              child: Column(
-                children: [
-                  InkWell(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete),
-                          SizedBox(width: 15),
-                          Text(
-                            'Move to trash',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      _moveNoteToTrash(context);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            );
-          }
+          return GestureDetector(
+            onTap: () {},
+            behavior: HitTestBehavior.opaque,
+            child: isNoteInTrash
+                ? _trashModalBottomSheetBuilder(context)
+                : _noteModalBottomSheetBuilder(context),
+          );
         }).then((_) {
       if (_wasDelete) {
         Navigator.pop(context);
@@ -170,7 +212,6 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           // if (nbTitle == 'Notes') {
           //   nbTitle = 'Interesting';
           // }
-          log('nbTitle $nbTitle');
           _editedNote = Note(
             id: _editedNote.id,
             title: _editedNote.title,
@@ -181,7 +222,6 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         }
       }
     }
-    log('_editedNote.isInTrash ${_editedNote.isInTrash}');
     return WillPopScope(
       onWillPop: () async {
         if (_isEditing) {
@@ -210,7 +250,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                showMoreActions(_editedNote.isInTrash);
+                showMoreActions(context, _editedNote.isInTrash);
               },
               icon: Icon(Icons.more_horiz),
             ),
