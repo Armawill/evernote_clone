@@ -145,8 +145,6 @@ class NoteListScreen extends StatelessWidget {
                 child: SliverFillRemaining(
                   child: LayoutBuilder(
                     builder: (context, constraints) => Column(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
                           padding: EdgeInsets.only(

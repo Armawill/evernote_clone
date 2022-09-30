@@ -31,8 +31,9 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   void _onNotebookAdded(AddNotebookEvent event, Emitter<NotebooksState> emit) {
     var newNotebook =
         Notebook(id: DateTime.now().toString(), title: event.title);
+    repository.addNotebook(newNotebook);
     emit(state.copyWith(
-        loadedNotebooks: List.from(repository.notebookList)..add(newNotebook)));
+        loadedNotebooks: List.from(state.loadedNotebooks)..add(newNotebook)));
   }
 
   void _onNoteToNotebookAdded(event, emit) {

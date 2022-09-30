@@ -27,10 +27,10 @@ class RemoveNoteEvent extends NotesEvent {
   List<Object> get props => [note];
 }
 
-class AddToTrashEvent extends NotesEvent {
+class MoveNoteToTrashEvent extends NotesEvent {
   final Note note;
 
-  const AddToTrashEvent(this.note);
+  const MoveNoteToTrashEvent(this.note);
 
   @override
   List<Object> get props => [note];

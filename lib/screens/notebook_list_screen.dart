@@ -40,7 +40,9 @@ class NotebookListScreen extends StatelessWidget {
             leadingWidth: ModalRoute.of(context)!.canPop ? 56 : 0,
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AddNotebookScreen.routeName);
+                },
                 icon: Icon(CustomIcons.add_notebook_filled),
               ),
               IconButton(
@@ -107,6 +109,7 @@ class NotebookListScreen extends StatelessWidget {
                                           child: Row(
                                             children: [
                                               Icon(CustomIcons.notebook_filled),
+                                              SizedBox(width: 10),
                                               RichText(
                                                 text: TextSpan(children: [
                                                   TextSpan(
@@ -138,10 +141,11 @@ class NotebookListScreen extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 7),
+                                    padding: const EdgeInsets.only(left: 10),
                                     child:
                                         Icon(CustomIcons.add_notebook_filled),
                                   ),
+                                  SizedBox(width: 7),
                                   Text(
                                     'New notebook',
                                     style: TextStyle(fontSize: 16),
@@ -160,7 +164,7 @@ class NotebookListScreen extends StatelessWidget {
                   //     child: Text('Something went wrong'),
                   //   );
                   // }
-                  return Center(
+                  return const Center(
                     child: Text('Something went wrong'),
                   );
                 },

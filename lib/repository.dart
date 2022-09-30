@@ -30,8 +30,14 @@ class Repository {
   }
 
   Future<void> addNote(Note editedNote) async {
+    if (notebookList.isEmpty) {
+      await getNotebooks();
+    }
     await _noteProvider.addNote(editedNote);
     noteList.add(editedNote);
+    var nbIndex =
+        notebookList.indexWhere((nb) => nb.title == editedNote.notebook);
+    notebookList[nbIndex].noteList.add(editedNote);
   }
 
   Future<void> deleteNote(String id) async {
@@ -44,7 +50,10 @@ class Repository {
     await _notebookProvider.addNotebook(notebook);
   }
 
-  void addToTrash(Note note) {
+  Future<void> moveNoteToTrash(Note note) async {
+    if (notebookList.isEmpty) {
+      await getNotebooks();
+    }
     trashList.add(noteList.firstWhere((n) => n.id == note.id));
     noteList.removeWhere((n) => n.id == note.id);
     var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);

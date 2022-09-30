@@ -66,7 +66,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     setState(() {
       _wasDelete = true;
     });
-    noteBloc.add(AddToTrashEvent(_editedNote));
+    noteBloc.add(MoveNoteToTrashEvent(_editedNote));
     notebookBloc
         .add(RemoveNoteFromNotebookEvent(_editedNote, _editedNote.notebook));
   }
@@ -181,7 +181,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         }
       }
     }
-
+    log('_editedNote.isInTrash ${_editedNote.isInTrash}');
     return WillPopScope(
       onWillPop: () async {
         if (_isEditing) {

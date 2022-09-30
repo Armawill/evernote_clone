@@ -15,7 +15,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<NotesLoadEvent>(_onNotesLoaded);
     on<AddNoteEvent>(_onNoteAdded);
     on<RemoveNoteEvent>(_onNoteRemoved);
-    on<AddToTrashEvent>(_onToTrashAdded);
+    on<MoveNoteToTrashEvent>(_onNoteToTrashMoved);
     on<ShowNotesFromNotebook>(_onNotesFromNotebookShowed);
   }
 
@@ -39,29 +39,35 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
 
   void _onNoteAdded(AddNoteEvent event, Emitter<NotesState> emit) {
     List<Note> loadedNotes = List.from(state.loadedNotes);
-    if (event.note.title.isEmpty) {
-      event.note.title = 'Untitled note';
+    var note = event.note;
+    if (note.title.isEmpty) {
+      note.title = 'Untitled note';
     }
     if (event.note.id.isEmpty) {
-      event.note.id.replaceRange(
-          0, null, DateTime.now().toString()); //id is a final variable
+      note = Note(
+        id: DateTime.now().toString(),
+        title: note.title,
+        text: note.text,
+        date: note.date,
+        notebook: note.notebook,
+      );
     }
 
     var noteIndex = loadedNotes.indexWhere(
-      (note) => note.id == event.note.id,
+      (note) => note.id == note.id,
     );
-    repository.addNote(event.note);
+    repository.addNote(note);
     if (noteIndex >= 0) {
       emit(
         state.copyWith(
           loadedNotes: List.from(loadedNotes)
-            ..replaceRange(noteIndex, noteIndex + 1, [event.note]),
+            ..replaceRange(noteIndex, noteIndex + 1, [note]),
         ),
       );
     } else {
       emit(
         state.copyWith(
-          loadedNotes: List.from(loadedNotes)..add(event.note),
+          loadedNotes: List.from(loadedNotes)..add(note),
         ),
       );
     }
@@ -76,10 +82,11 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     );
   }
 
-  void _onToTrashAdded(AddToTrashEvent event, Emitter<NotesState> emit) {
+  void _onNoteToTrashMoved(
+      MoveNoteToTrashEvent event, Emitter<NotesState> emit) {
     var loadedNotes = List.from(state.loadedNotes);
     var trashList = List.from(state.trashNotesList);
-    repository.addToTrash(event.note);
+    repository.moveNoteToTrash(event.note);
     // var noteIndex = loadedNotes.indexWhere((note) => note.id == event.note.id);
     emit(
       state.copyWith(
