@@ -33,7 +33,7 @@ class Repository {
     if (notebookList.isEmpty) {
       await getNotebooks();
     }
-    await _noteProvider.addNote(editedNote);
+    await _noteProvider.saveNote(editedNote);
     noteList.add(editedNote);
     var nbIndex =
         notebookList.indexWhere((nb) => nb.title == editedNote.notebook);
@@ -50,14 +50,35 @@ class Repository {
     await _notebookProvider.addNotebook(notebook);
   }
 
-  Future<void> moveNoteToTrash(Note note) async {
+  void moveNoteToTrash(Note note) async {
     if (notebookList.isEmpty) {
       await getNotebooks();
     }
-    trashList.add(noteList.firstWhere((n) => n.id == note.id));
+    note.isInTrash = true;
+    note.date = DateTime.now();
+    trashList.add(note);
     noteList.removeWhere((n) => n.id == note.id);
     var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);
     notebookList[nbIndex].noteList.removeWhere((n) => n.id == note.id);
-    _noteProvider.addToTrash(note);
+    _noteProvider.saveNote(note);
+  }
+
+  void restoreNote(Note note) async {
+    if (notebookList.isEmpty) {
+      await getNotebooks();
+    }
+    note.isInTrash = false;
+    note.date = DateTime.now();
+    var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);
+    if (nbIndex >= 0) {
+      await _noteProvider.saveNote(note);
+      notebookList[nbIndex].noteList.add(note);
+    } else {
+      await _noteProvider.saveNote(note);
+      note.notebook = notebookList.first.title; // Notebook 'Interesting'
+      notebookList.first.noteList.add(note);
+    }
+    trashList.removeWhere((n) => n.id == note.id);
+    noteList.add(note);
   }
 }

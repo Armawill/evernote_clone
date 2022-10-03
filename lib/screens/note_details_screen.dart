@@ -23,7 +23,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   late FocusNode _focusText;
   late FocusNode _focusTitle;
   bool _isEditing = false;
-  bool _wasDelete = false;
+  bool _wasDeletedOrRestored = false;
   final _form = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var _editedNote = Note.empty();
@@ -54,9 +54,8 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
 
   void _deleteNote(BuildContext ctx) {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
-    var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     setState(() {
-      _wasDelete = true;
+      _wasDeletedOrRestored = true;
     });
     noteBloc.add(RemoveNoteEvent(_editedNote));
   }
@@ -65,11 +64,21 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
     var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     setState(() {
-      _wasDelete = true;
+      _wasDeletedOrRestored = true;
     });
     noteBloc.add(MoveNoteToTrashEvent(_editedNote));
     notebookBloc
         .add(RemoveNoteFromNotebookEvent(_editedNote, _editedNote.notebook));
+  }
+
+  void _restoreNote(BuildContext ctx, Note editedNote) {
+    setState(() {
+      _wasDeletedOrRestored = true;
+    });
+    context.read<NotesBloc>().add(RestoreNoteFromTrash(editedNote));
+    context
+        .read<NotebooksBloc>()
+        .add(AddNoteToNotebookEvent(editedNote, editedNote.notebook));
   }
 
   void editModeOn() {
@@ -84,7 +93,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     });
   }
 
-  Widget _trashModalBottomSheetBuilder(BuildContext context) {
+  Widget _trashModalBottomSheetBuilder(BuildContext context, Note editedNote) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -110,7 +119,10 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
               fontSize: 16,
             ),
           ),
-          onTap: () {},
+          onTap: () {
+            _restoreNote(context, editedNote);
+            Navigator.pop(context);
+          },
         ),
         ListTile(
           leading: Icon(
@@ -170,7 +182,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     );
   }
 
-  void showMoreActions(BuildContext ctx, bool isNoteInTrash) {
+  void showMoreActions(BuildContext ctx, Note editedNote) {
     showModalBottomSheet(
         context: ctx,
         shape: RoundedRectangleBorder(
@@ -182,12 +194,12 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           return GestureDetector(
             onTap: () {},
             behavior: HitTestBehavior.opaque,
-            child: isNoteInTrash
-                ? _trashModalBottomSheetBuilder(context)
+            child: editedNote.isInTrash
+                ? _trashModalBottomSheetBuilder(context, editedNote)
                 : _noteModalBottomSheetBuilder(context),
           );
         }).then((_) {
-      if (_wasDelete) {
+      if (_wasDeletedOrRestored) {
         Navigator.pop(context);
       }
     });
@@ -250,7 +262,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                showMoreActions(context, _editedNote.isInTrash);
+                showMoreActions(context, _editedNote);
               },
               icon: Icon(Icons.more_horiz),
             ),

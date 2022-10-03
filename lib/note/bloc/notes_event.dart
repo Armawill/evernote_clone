@@ -36,6 +36,15 @@ class MoveNoteToTrashEvent extends NotesEvent {
   List<Object> get props => [note];
 }
 
+class RestoreNoteFromTrash extends NotesEvent {
+  final Note note;
+
+  const RestoreNoteFromTrash(this.note);
+
+  @override
+  List<Object> get props => [note];
+}
+
 class ShowNotesFromNotebook extends NotesEvent {
   final String notebookTitle;
 

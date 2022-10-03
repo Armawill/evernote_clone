@@ -28,7 +28,7 @@ class NoteProvider {
     }
   }
 
-  Future<void> addNote(Note note) async {
+  Future<void> saveNote(Note note) async {
     try {
       await DBHelper.insert(
         'user_notes',
@@ -54,11 +54,5 @@ class NoteProvider {
       print(err);
       throw (err);
     }
-  }
-
-  void addToTrash(Note note) {
-    note.date = DateTime.now();
-    note.isInTrash = true;
-    addNote(note);
   }
 }

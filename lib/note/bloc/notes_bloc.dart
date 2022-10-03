@@ -17,6 +17,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<RemoveNoteEvent>(_onNoteRemoved);
     on<MoveNoteToTrashEvent>(_onNoteToTrashMoved);
     on<ShowNotesFromNotebook>(_onNotesFromNotebookShowed);
+    on<RestoreNoteFromTrash>(_onNoteFromTrashRestored);
   }
 
   Future<void> _onNotesLoaded(
@@ -86,6 +87,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       MoveNoteToTrashEvent event, Emitter<NotesState> emit) {
     var loadedNotes = List.from(state.loadedNotes);
     var trashList = List.from(state.trashNotesList);
+
     repository.moveNoteToTrash(event.note);
     // var noteIndex = loadedNotes.indexWhere((note) => note.id == event.note.id);
     emit(
@@ -111,6 +113,18 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(state.copyWith(
           loadedNotes: List.from(repository.notebookList[nbIndex].noteList)));
     }
+  }
+
+  void _onNoteFromTrashRestored(
+    RestoreNoteFromTrash event,
+    Emitter<NotesState> emit,
+  ) {
+    repository.restoreNote(event.note);
+    emit(state.copyWith(
+      loadedNotes: List.from(state.loadedNotes)
+        ..removeWhere((n) => n.id == event.note.id),
+      trashNotesList: List.from(repository.trashList),
+    ));
   }
 }
 
