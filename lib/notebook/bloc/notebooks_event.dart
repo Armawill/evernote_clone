@@ -39,11 +39,10 @@ class AddNotebookEvent extends NotebookEvent {
 }
 
 class RemoveNotebookEvent extends NotebookEvent {
-  final Notebook notebook;
+  final String notebookTitle;
 
-  const RemoveNotebookEvent(this.notebook);
+  const RemoveNotebookEvent(this.notebookTitle);
 
   @override
-  // TODO: implement props
-  List<Object> get props => [notebook];
+  List<Object> get props => [notebookTitle];
 }

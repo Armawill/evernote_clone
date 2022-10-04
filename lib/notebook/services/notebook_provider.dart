@@ -47,4 +47,12 @@ class NotebookProvider {
       throw (err);
     }
   }
+
+  Future<void> deleteNotebook(String id) async {
+    try {
+      DBHelper.delete('user_notebooks', id);
+    } catch (err) {
+      throw (err);
+    }
+  }
 }

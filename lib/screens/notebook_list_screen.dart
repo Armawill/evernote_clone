@@ -20,6 +20,71 @@ class NotebookListScreen extends StatelessWidget {
     _scaffoldKey.currentState?.openDrawer();
   }
 
+  Widget _notebooksModalBottomSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            CustomIcons.add_notebook_filled,
+          ),
+          title: Text(
+            'New notebook',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.sort,
+          ),
+          title: Text(
+            'Sort by',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.settings,
+          ),
+          title: Text(
+            'Notebooks settings',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+
+  void showMoreActions(BuildContext ctx) {
+    showModalBottomSheet(
+        context: ctx,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+        ),
+        builder: (_) {
+          return GestureDetector(
+            onTap: () {},
+            behavior: HitTestBehavior.opaque,
+            child: _notebooksModalBottomSheetBuilder(ctx),
+          );
+        }).then((_) {
+      // if (_wasDeletedOrRestored) {
+      //   Navigator.pop(context);
+      // }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +111,9 @@ class NotebookListScreen extends StatelessWidget {
                 icon: Icon(CustomIcons.add_notebook_filled),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  showMoreActions(context);
+                },
                 icon: Icon(Icons.more_horiz),
               ),
             ],

@@ -12,11 +12,12 @@ part 'notebooks_state.dart';
 
 class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   Repository repository;
-  NotebooksBloc(this.repository) : super(NotebooksState()) {
+  NotebooksBloc(this.repository) : super(const NotebooksState()) {
     on<NotebooksLoadEvent>(_onNotebooksLoaded);
     on<AddNoteToNotebookEvent>(_onNoteToNotebookAdded);
     on<RemoveNoteFromNotebookEvent>(_onNoteFromNotebookRemoved);
     on<AddNotebookEvent>(_onNotebookAdded);
+    on<RemoveNotebookEvent>(_onNotebookRemoved);
   }
 
   Future<void> _onNotebooksLoaded(
@@ -25,7 +26,12 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   ) async {
     emit(state.copyWith(isLoading: true));
     await repository.getNotebooks();
-    emit(state.copyWith(loadedNotebooks: List.from(repository.notebookList)));
+    List<Notebook> notebooks = [];
+    List<Notebook> temp = List.from(repository.notebookList);
+    for (int i = 0; i < temp.length; i++) {
+      notebooks.add(Notebook.clone(temp[i]));
+    }
+    emit(state.copyWith(loadedNotebooks: List.from(notebooks)));
   }
 
   void _onNotebookAdded(AddNotebookEvent event, Emitter<NotebooksState> emit) {
@@ -34,6 +40,19 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     repository.addNotebook(newNotebook);
     emit(state.copyWith(
         loadedNotebooks: List.from(state.loadedNotebooks)..add(newNotebook)));
+  }
+
+  void _onNotebookRemoved(
+    RemoveNotebookEvent event,
+    Emitter<NotebooksState> emit,
+  ) {
+    repository.deleteNotebook(event.notebookTitle);
+    emit(
+      state.copyWith(
+        loadedNotebooks: List.from(state.loadedNotebooks)
+          ..removeWhere((nb) => nb.title == event.notebookTitle),
+      ),
+    );
   }
 
   void _onNoteToNotebookAdded(event, emit) {
@@ -64,26 +83,28 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   }
 
   void _onNoteFromNotebookRemoved(event, emit) {
+    log('state.loadedNotebooks.first.noteList.length ${state.loadedNotebooks.first.noteList.length}');
     List<Notebook> notebooks = [];
     List<Notebook> temp = List.from(state.loadedNotebooks);
     for (int i = 0; i < temp.length; i++) {
       notebooks.add(Notebook.clone(temp[i]));
     }
 
-    var index = notebooks.indexWhere(
+    var nbIndex = notebooks.indexWhere(
       (nb) => nb.title == event.notebookName,
     );
+    log('notebooks.first.noteList ${notebooks.first.noteList.length}');
 
-    if (index >= 0) {
-      var noteIndex = notebooks[index]
+    if (nbIndex >= 0) {
+      var noteIndex = notebooks[nbIndex]
           .noteList
           .indexWhere((note) => note.id == event.note.id);
       if (noteIndex >= 0) {
-        notebooks[index].noteList.remove(event.note);
+        notebooks[nbIndex].noteList.removeAt(noteIndex);
       } else {
         log('Error from _onNoteFromNotebookRemoved: note isn\'t exsist');
       }
-      emit(state.copyWith(loadedNotebooks: notebooks));
+      emit(state.copyWith(loadedNotebooks: List.from(notebooks)));
     }
   }
 }

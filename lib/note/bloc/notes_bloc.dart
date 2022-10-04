@@ -40,38 +40,39 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
 
   void _onNoteAdded(AddNoteEvent event, Emitter<NotesState> emit) {
     List<Note> loadedNotes = List.from(state.loadedNotes);
-    var note = event.note;
-    if (note.title.isEmpty) {
-      note.title = 'Untitled note';
-    }
-    if (event.note.id.isEmpty) {
-      note = Note(
-        id: DateTime.now().toString(),
-        title: note.title,
-        text: note.text,
-        date: note.date,
-        notebook: note.notebook,
-      );
-    }
+    var editedNote = event.note;
+    // if (editedNote.title.isEmpty) {
+    //   editedNote.title = 'Untitled note';
+    // }
+    // if (event.note.id.isEmpty) {
+    //   editedNote = Note(
+    //     id: DateTime.now().toString(),
+    //     title: editedNote.title,
+    //     text: editedNote.text,
+    //     date: editedNote.date,
+    //     notebook: editedNote.notebook,
+    //   );
+    // }
 
     var noteIndex = loadedNotes.indexWhere(
-      (note) => note.id == note.id,
+      (note) => note.id == editedNote.id,
     );
-    repository.addNote(note);
+
     if (noteIndex >= 0) {
       emit(
         state.copyWith(
           loadedNotes: List.from(loadedNotes)
-            ..replaceRange(noteIndex, noteIndex + 1, [note]),
+            ..replaceRange(noteIndex, noteIndex + 1, [editedNote]),
         ),
       );
     } else {
       emit(
         state.copyWith(
-          loadedNotes: List.from(loadedNotes)..add(note),
+          loadedNotes: List.from(loadedNotes)..add(editedNote),
         ),
       );
     }
+    repository.addNote(editedNote);
   }
 
   void _onNoteRemoved(RemoveNoteEvent event, Emitter<NotesState> emit) {
@@ -92,7 +93,8 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     // var noteIndex = loadedNotes.indexWhere((note) => note.id == event.note.id);
     emit(
       state.copyWith(
-        loadedNotes: List.from(loadedNotes)..remove(event.note),
+        loadedNotes: List.from(loadedNotes)
+          ..removeWhere((note) => note.id == event.note.id),
         trashNotesList: List.from(trashList)
           ..add(
             loadedNotes.firstWhere((e) => e.id == event.note.id),

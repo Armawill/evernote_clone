@@ -1,10 +1,13 @@
 import 'dart:developer';
 
+import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/repository.dart';
+import 'package:evernote_clone/screens/notebook_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../note/note.dart';
+import '../notebook/notebook.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/fade_on_scroll.dart';
 import '../widgets/my_bottom_app_bar.dart';
@@ -19,6 +22,7 @@ class NoteListScreen extends StatelessWidget {
 
   final ScrollController scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _wasNotebookDelete = false;
 
   void _openDrawer() {
     _scaffoldKey.currentState!.openDrawer();
@@ -44,7 +48,9 @@ class NoteListScreen extends StatelessWidget {
           elevation: 1,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showMoreActions(context, notebook);
+              },
               icon: const Icon(Icons.more_horiz),
             ),
           ],
@@ -91,6 +97,204 @@ class NoteListScreen extends StatelessWidget {
     );
   }
 
+  void _deleteNotebook(BuildContext context, String notebook) {
+    context.read<NotebooksBloc>().add(RemoveNotebookEvent(notebook));
+    Navigator.of(context).pushReplacementNamed(NotebookListScreen.routeName);
+  }
+
+  Widget _trashModalBottomSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            Icons.apps,
+          ),
+          title: Text(
+            'View options',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.sort,
+          ),
+          title: Text(
+            'Sort by',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
+          title: Text(
+            'Empty trash',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.red,
+            ),
+          ),
+          onTap: () {
+            // _deleteNote(context);
+            // Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _notesModalBottomSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            Icons.apps,
+          ),
+          title: Text(
+            'View options',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.sort,
+          ),
+          title: Text(
+            'Sort by',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.filter_alt,
+          ),
+          title: Text(
+            'Filter Notes',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget _notesInNotebookModalBottomSheetBuilder(
+      BuildContext context, String notebook) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(
+            Icons.apps,
+          ),
+          title: Text(
+            'View options',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.sort,
+          ),
+          title: Text(
+            'Sort by',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.filter_alt,
+          ),
+          title: Text(
+            'Filter Notes',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        Divider(
+          thickness: 3,
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.edit,
+          ),
+          title: Text(
+            'Rename notebook',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {},
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.delete,
+            color: notebook == 'Interesting' ? Colors.grey : Colors.red,
+          ),
+          title: Text(
+            'Delete notebook',
+            style: TextStyle(
+              fontSize: 16,
+              color: notebook == 'Interesting' ? Colors.grey : Colors.red,
+            ),
+          ),
+          enabled: notebook == 'Interesting' ? false : true,
+          onTap: () {
+            _deleteNotebook(context, notebook);
+          },
+        ),
+      ],
+    );
+  }
+
+  void showMoreActions(BuildContext ctx, String notebook) {
+    showModalBottomSheet(
+        context: ctx,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+        ),
+        builder: (_) {
+          if (notebook == TRASH) {
+            return _trashModalBottomSheetBuilder(ctx);
+          } else if (notebook == NOTES) {
+            return _notesModalBottomSheetBuilder(ctx);
+          } else {
+            return _notesInNotebookModalBottomSheetBuilder(ctx, notebook);
+          }
+        }).then((_) {
+      // if (_wasNotebookDelete) {
+      //   Navigator.pop(ctx);
+      // }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String notebook;
@@ -99,6 +303,7 @@ class NoteListScreen extends StatelessWidget {
     } catch (err) {
       notebook = NOTES;
     }
+
     context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
 
     return Scaffold(

@@ -45,6 +45,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   void _saveNote(BuildContext ctx) {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
     var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
+    _editedNote = Note.verify(_editedNote);
     editModeOff();
     _form.currentState!.save();
     _editedNote.date = DateTime.now();

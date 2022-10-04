@@ -80,6 +80,9 @@ class MyApp extends StatelessWidget {
               color: Colors.white,
               iconTheme: IconThemeData(color: Colors.black),
             ),
+            listTileTheme: ListTileThemeData(
+              iconColor: Colors.black,
+            ),
             scaffoldBackgroundColor: Colors.white,
           ),
           home: HomeScreen(),
