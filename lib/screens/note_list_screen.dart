@@ -1,14 +1,11 @@
 import 'dart:developer';
 
-import 'package:evernote_clone/presentation/custom_icons_icons.dart';
-import 'package:evernote_clone/repository.dart';
-import 'package:evernote_clone/screens/notebook_list_screen.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
+import 'package:evernote_clone/widgets/top_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../note/note.dart';
-import '../notebook/notebook.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/fade_on_scroll.dart';
 import '../widgets/my_bottom_app_bar.dart';
@@ -20,10 +17,13 @@ const NOTES = 'Notes';
 
 class NoteListScreen extends StatelessWidget {
   static const routeName = '/note-list';
-
   final ScrollController scrollController = ScrollController();
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _wasNotebookDelete = false;
+
+  bool _wasMovedToTrash = false;
+
+  bool _wasRestored = false;
 
   void _openDrawer() {
     _scaffoldKey.currentState!.openDrawer();
@@ -98,16 +98,12 @@ class NoteListScreen extends StatelessWidget {
     );
   }
 
-  void _deleteNotebook(BuildContext context, String notebook) {
-    context.read<NotebooksBloc>().add(RemoveNotebookEvent(notebook));
-    Navigator.of(context).pushReplacementNamed(NotebookListScreen.routeName);
-  }
-
   void showMoreActions(BuildContext ctx, String notebook) {
     showModalBottomSheet(
         context: ctx,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
+        shape: const RoundedRectangleBorder(
+            borderRadius:
+                const BorderRadius.vertical(top: const Radius.circular(10))),
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(ctx).size.height * 0.75,
         ),
@@ -119,16 +115,9 @@ class NoteListScreen extends StatelessWidget {
           } else {
             return ModalBottomSheet.notebookMenu(
               notebookTitle: notebook,
-              // deleteNotebook: () {
-              //   _deleteNotebook(ctx, notebook);
-              // },
             );
           }
-        }).then((_) {
-      // if (_wasNotebookDelete) {
-      //   Navigator.pop(ctx);
-      // }
-    });
+        }).then((_) {});
   }
 
   @override
@@ -145,7 +134,33 @@ class NoteListScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       drawer: AppDrawer(),
-      body: BlocBuilder<NotesBloc, NotesState>(
+      body: BlocConsumer<NotesBloc, NotesState>(
+        listenWhen: (previous, current) {
+          if ((previous.loadedNotes.length > current.loadedNotes.length) &&
+              (previous.trashNotesList.length <
+                  current.trashNotesList.length)) {
+            _wasMovedToTrash = !_wasMovedToTrash;
+
+            return true;
+          } else if ((previous.loadedNotes.length >
+                  current.loadedNotes.length) &&
+              (previous.trashNotesList.length >
+                  current.trashNotesList.length)) {
+            _wasRestored = !_wasRestored;
+
+            return true;
+          } else {
+            return false;
+          }
+        },
+        listener: (context, state) {
+          if (_wasMovedToTrash) {
+            TopSnackBar.deleteNote(context).show(context);
+          }
+          if (_wasRestored) {
+            TopSnackBar.restoreNote(context).show(context);
+          }
+        },
         builder: (context, state) {
           if (state.isLoading) {
             return const SliverFillRemaining(
@@ -197,13 +212,13 @@ class NoteListScreen extends StatelessWidget {
                             color: Colors.grey[600],
                           ),
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         const Text(
                           'No notes yet',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Container(
                           width: constraints.maxWidth * 0.6,
                           child: RichText(

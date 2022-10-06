@@ -19,7 +19,7 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Home'),
                 onTap: () {
                   _pop(context);
-                  Navigator.of(context).pushNamed('/');
+                  Navigator.of(context).pushReplacementNamed('/');
                 },
               ),
               ListTile(
@@ -27,7 +27,8 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Notes'),
                 onTap: () {
                   _pop(context);
-                  Navigator.of(context).pushNamed(NoteListScreen.routeName);
+                  Navigator.of(context)
+                      .pushReplacementNamed(NoteListScreen.routeName);
                 },
               ),
               // ListTile(
@@ -40,7 +41,8 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Notebooks'),
                 onTap: () {
                   _pop(context);
-                  Navigator.of(context).pushNamed(NotebookListScreen.routeName);
+                  Navigator.of(context)
+                      .pushReplacementNamed(NotebookListScreen.routeName);
                 },
               ),
               ListTile(
@@ -48,8 +50,9 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Trash'),
                 onTap: () {
                   _pop(context);
-                  Navigator.of(context)
-                      .pushNamed(NoteListScreen.routeName, arguments: 'Trash');
+                  Navigator.of(context).pushReplacementNamed(
+                      NoteListScreen.routeName,
+                      arguments: 'Trash');
                 },
               ),
             ],
@@ -60,7 +63,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   void _pop(BuildContext context) {
-    while (ModalRoute.of(context)!.canPop) {
+    while (Navigator.of(context).canPop()) {
       Navigator.pop(context);
     }
   }

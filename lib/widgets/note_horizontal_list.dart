@@ -1,3 +1,4 @@
+import 'package:evernote_clone/widgets/top_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,13 +7,44 @@ import '../widgets/note_card.dart';
 import './all_note_card.dart';
 
 class NoteHorizontalList extends StatelessWidget {
+  bool _wasMovedToTrash = false;
+  bool _wasRestored = false;
+
   @override
   Widget build(BuildContext context) {
     context.read<NotesBloc>().add(const ShowNotesFromNotebook('Notes'));
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.3,
-      child: BlocBuilder<NotesBloc, NotesState>(
+      child: BlocConsumer<NotesBloc, NotesState>(
+        listenWhen: (previous, current) {
+          if ((previous.loadedNotes.length > current.loadedNotes.length) &&
+              (previous.trashNotesList.length <
+                  current.trashNotesList.length)) {
+            // setState(() {
+            _wasMovedToTrash = !_wasMovedToTrash;
+            // });
+            return true;
+          } else if ((previous.loadedNotes.length >
+                  current.loadedNotes.length) &&
+              (previous.trashNotesList.length >
+                  current.trashNotesList.length)) {
+            // setState(() {
+            _wasRestored = !_wasRestored;
+            // });
+            return true;
+          } else {
+            return false;
+          }
+        },
+        listener: (context, state) {
+          if (_wasMovedToTrash) {
+            TopSnackBar.deleteNote(context).show(context);
+          }
+          if (_wasRestored) {
+            TopSnackBar.restoreNote(context).show(context);
+          }
+        },
         builder: (context, state) {
           if (state.isLoading) {
             return const Center(
