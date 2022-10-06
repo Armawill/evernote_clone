@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 class Note extends Equatable {
-  late final String id;
-  late String title;
+  final String id;
+  String title;
   String text;
   DateTime date;
   String notebook;
@@ -25,17 +25,20 @@ class Note extends Equatable {
         notebook = 'Interesting',
         isInTrash = false;
 
-  Note.verify(Note source)
-      : text = source.text,
-        date = source.date,
-        notebook = source.notebook,
-        isInTrash = source.isInTrash {
+  static Note verify(Note source) {
+    String id = source.id, title = source.title;
     if (source.id.isEmpty) {
       id = DateTime.now().toString();
     }
     if (source.title.isEmpty) {
       title = 'Untitled note';
     }
+    return Note(
+        id: id,
+        title: title,
+        text: source.text,
+        date: source.date,
+        notebook: source.notebook);
   }
 
   @override

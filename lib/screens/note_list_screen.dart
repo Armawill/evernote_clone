@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/repository.dart';
 import 'package:evernote_clone/screens/notebook_list_screen.dart';
+import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -102,176 +103,6 @@ class NoteListScreen extends StatelessWidget {
     Navigator.of(context).pushReplacementNamed(NotebookListScreen.routeName);
   }
 
-  Widget _trashModalBottomSheetBuilder(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          leading: Icon(
-            Icons.apps,
-          ),
-          title: Text(
-            'View options',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.sort,
-          ),
-          title: Text(
-            'Sort by',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
-          title: Text(
-            'Empty trash',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.red,
-            ),
-          ),
-          onTap: () {
-            // _deleteNote(context);
-            // Navigator.pop(context);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _notesModalBottomSheetBuilder(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          leading: Icon(
-            Icons.apps,
-          ),
-          title: Text(
-            'View options',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.sort,
-          ),
-          title: Text(
-            'Sort by',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.filter_alt,
-          ),
-          title: Text(
-            'Filter Notes',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-      ],
-    );
-  }
-
-  Widget _notesInNotebookModalBottomSheetBuilder(
-      BuildContext context, String notebook) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          leading: Icon(
-            Icons.apps,
-          ),
-          title: Text(
-            'View options',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.sort,
-          ),
-          title: Text(
-            'Sort by',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.filter_alt,
-          ),
-          title: Text(
-            'Filter Notes',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        Divider(
-          thickness: 3,
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.edit,
-          ),
-          title: Text(
-            'Rename notebook',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.delete,
-            color: notebook == 'Interesting' ? Colors.grey : Colors.red,
-          ),
-          title: Text(
-            'Delete notebook',
-            style: TextStyle(
-              fontSize: 16,
-              color: notebook == 'Interesting' ? Colors.grey : Colors.red,
-            ),
-          ),
-          enabled: notebook == 'Interesting' ? false : true,
-          onTap: () {
-            _deleteNotebook(context, notebook);
-          },
-        ),
-      ],
-    );
-  }
-
   void showMoreActions(BuildContext ctx, String notebook) {
     showModalBottomSheet(
         context: ctx,
@@ -282,11 +113,16 @@ class NoteListScreen extends StatelessWidget {
         ),
         builder: (_) {
           if (notebook == TRASH) {
-            return _trashModalBottomSheetBuilder(ctx);
+            return ModalBottomSheet.trashListMenu();
           } else if (notebook == NOTES) {
-            return _notesModalBottomSheetBuilder(ctx);
+            return ModalBottomSheet.noteListMenu();
           } else {
-            return _notesInNotebookModalBottomSheetBuilder(ctx, notebook);
+            return ModalBottomSheet.notebookMenu(
+              notebookTitle: notebook,
+              // deleteNotebook: () {
+              //   _deleteNotebook(ctx, notebook);
+              // },
+            );
           }
         }).then((_) {
       // if (_wasNotebookDelete) {

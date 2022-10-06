@@ -78,12 +78,14 @@ class Repository {
     }
     note.isInTrash = true;
     note.date = DateTime.now();
-    trashList.add(note);
-    noteList.removeWhere((n) => n.id == note.id);
+
     if (!willNotebookDelete) {
+      note.notebook = 'Interesting';
       var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);
       notebookList[nbIndex].noteList.removeWhere((n) => n.id == note.id);
     }
+    trashList.add(note);
+    noteList.removeWhere((n) => n.id == note.id);
     _noteProvider.saveNote(note);
   }
 

@@ -18,15 +18,16 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(Icons.home),
                 title: Text('Home'),
                 onTap: () {
-                  Navigator.of(context).pushReplacementNamed('/');
+                  _pop(context);
+                  Navigator.of(context).pushNamed('/');
                 },
               ),
               ListTile(
                 leading: Icon(CustomIcons.note_filled),
                 title: Text('Notes'),
                 onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(NoteListScreen.routeName);
+                  _pop(context);
+                  Navigator.of(context).pushNamed(NoteListScreen.routeName);
                 },
               ),
               // ListTile(
@@ -38,17 +39,17 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(CustomIcons.notebook_filled),
                 title: Text('Notebooks'),
                 onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(NotebookListScreen.routeName);
+                  _pop(context);
+                  Navigator.of(context).pushNamed(NotebookListScreen.routeName);
                 },
               ),
               ListTile(
                 leading: Icon(Icons.delete),
                 title: Text('Trash'),
                 onTap: () {
-                  Navigator.of(context).pushReplacementNamed(
-                      NoteListScreen.routeName,
-                      arguments: 'Trash');
+                  _pop(context);
+                  Navigator.of(context)
+                      .pushNamed(NoteListScreen.routeName, arguments: 'Trash');
                 },
               ),
             ],
@@ -56,5 +57,11 @@ class AppDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _pop(BuildContext context) {
+    while (ModalRoute.of(context)!.canPop) {
+      Navigator.pop(context);
+    }
   }
 }

@@ -83,7 +83,6 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
   }
 
   void _onNoteFromNotebookRemoved(event, emit) {
-    log('state.loadedNotebooks.first.noteList.length ${state.loadedNotebooks.first.noteList.length}');
     List<Notebook> notebooks = [];
     List<Notebook> temp = List.from(state.loadedNotebooks);
     for (int i = 0; i < temp.length; i++) {
@@ -93,7 +92,6 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     var nbIndex = notebooks.indexWhere(
       (nb) => nb.title == event.notebookName,
     );
-    log('notebooks.first.noteList ${notebooks.first.noteList.length}');
 
     if (nbIndex >= 0) {
       var noteIndex = notebooks[nbIndex]
