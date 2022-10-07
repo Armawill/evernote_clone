@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../note/note.dart';
 import '../screens/note_list_screen.dart';
 import '../screens/notebook_list_screen.dart';
 
@@ -27,6 +29,7 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Notes'),
                 onTap: () {
                   _pop(context);
+                  context.read<NotesBloc>().add(ShowNotesFromNotebook('Notes'));
                   Navigator.of(context)
                       .pushReplacementNamed(NoteListScreen.routeName);
                 },
@@ -50,6 +53,7 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Trash'),
                 onTap: () {
                   _pop(context);
+                  context.read<NotesBloc>().add(ShowNotesFromNotebook('Trash'));
                   Navigator.of(context).pushReplacementNamed(
                       NoteListScreen.routeName,
                       arguments: 'Trash');

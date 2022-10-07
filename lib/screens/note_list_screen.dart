@@ -129,7 +129,7 @@ class NoteListScreen extends StatelessWidget {
       notebook = NOTES;
     }
 
-    context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
+    // context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
 
     return Scaffold(
       key: _scaffoldKey,

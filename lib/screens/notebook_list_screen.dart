@@ -4,6 +4,7 @@ import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../note/note.dart';
 import '../notebook/notebook.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/my_bottom_app_bar.dart';
@@ -167,6 +168,8 @@ class NotebookListScreen extends StatelessWidget {
                             ...notebooks
                                 .map((nb) => ListTile(
                                       onTap: () {
+                                        context.read<NotesBloc>().add(
+                                            ShowNotesFromNotebook(nb.title));
                                         Navigator.of(context).pushNamed(
                                             NoteListScreen.routeName,
                                             arguments: nb.title);
