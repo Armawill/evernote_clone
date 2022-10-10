@@ -53,3 +53,5 @@ class ShowNotesFromNotebook extends NotesEvent {
   @override
   List<Object> get props => [notebookTitle];
 }
+
+class EmptyTrash extends NotesEvent {}

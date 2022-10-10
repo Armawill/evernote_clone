@@ -18,6 +18,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<MoveNoteToTrashEvent>(_onNoteToTrashMoved);
     on<ShowNotesFromNotebook>(_onNotesFromNotebookShowed);
     on<RestoreNoteFromTrash>(_onNoteFromTrashRestored);
+    on<EmptyTrash>(_onEmptiedTrash);
   }
 
   Future<void> _onNotesLoaded(
@@ -26,12 +27,17 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     try {
       emit(state.copyWith(isLoading: true));
+      await Future.delayed(const Duration(milliseconds: 500));
       await repository.getNotes();
+
       var loadedNotes = repository.noteList;
       var trashNotesList = repository.trashList;
 
       emit(state.copyWith(
-          loadedNotes: List.from(loadedNotes), trashNotesList: trashNotesList));
+        loadedNotes: List.from(loadedNotes),
+        trashNotesList: List.from(trashNotesList),
+        isLoading: false,
+      ));
     } catch (err) {
       log('Error from NotesBloc: $err');
       // emit(NotesErrorState());
@@ -130,6 +136,18 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       trashNotesList: List.from(state.trashNotesList)
         ..removeWhere((n) => n.id == event.note.id),
     ));
+  }
+
+  void _onEmptiedTrash(EmptyTrash event, Emitter<NotesState> emit) async {
+    repository.emptyTrash();
+    emit(state.copyWith(isLoading: true));
+    await Future.delayed(const Duration(milliseconds: 300));
+    emit(
+      state.copyWith(
+          loadedNotes: List.from(state.loadedNotes)..clear(),
+          trashNotesList: List.from(state.trashNotesList)..clear(),
+          isLoading: false),
+    );
   }
 }
 

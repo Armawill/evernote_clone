@@ -12,7 +12,7 @@ class NotesState extends Equatable {
   NotesState({
     this.loadedNotes = const [],
     this.trashNotesList = const [],
-    this.isLoading = false,
+    this.isLoading = true,
   }) {
     isNoteListEmpty = loadedNotes.isEmpty;
     isNoteListNotEmpty = loadedNotes.isNotEmpty;
@@ -23,12 +23,12 @@ class NotesState extends Equatable {
   NotesState copyWith({
     List<Note>? loadedNotes,
     List<Note>? trashNotesList,
-    bool isLoading = false,
+    bool? isLoading,
   }) =>
       NotesState(
         loadedNotes: loadedNotes ?? this.loadedNotes,
         trashNotesList: trashNotesList ?? this.trashNotesList,
-        isLoading: isLoading,
+        isLoading: isLoading ?? this.isLoading,
       );
 
   @override

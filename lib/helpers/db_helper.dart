@@ -66,6 +66,12 @@ class DBHelper {
     );
   }
 
+  static Future<void> multipleDelete(
+      String table, String paramName, int paramValue) async {
+    final db = await DBHelper.database();
+    await db.execute("DELETE FROM $table WHERE $paramName = $paramValue");
+  }
+
   static Future<List<Map<String, dynamic>>> getData(String table) async {
     final db = await DBHelper.database();
     return db.query(table);

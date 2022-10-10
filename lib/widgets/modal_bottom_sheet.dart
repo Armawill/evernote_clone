@@ -66,6 +66,10 @@ class ModalBottomSheet extends StatelessWidget {
     }
   }
 
+  void _emptyTrash(BuildContext context) {
+    context.read<NotesBloc>().add(EmptyTrash());
+  }
+
   Widget _trashListModalBottomSheetBuilder(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -106,7 +110,10 @@ class ModalBottomSheet extends StatelessWidget {
               color: Colors.red,
             ),
           ),
-          onTap: () {},
+          onTap: () {
+            _emptyTrash(context);
+            Navigator.pop(context);
+          },
         ),
       ],
     );

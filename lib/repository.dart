@@ -107,4 +107,9 @@ class Repository {
     trashList.removeWhere((n) => n.id == note.id);
     noteList.add(note);
   }
+
+  void emptyTrash() {
+    trashList.clear();
+    _noteProvider.emptyTrash();
+  }
 }

@@ -55,4 +55,12 @@ class NoteProvider {
       throw (err);
     }
   }
+
+  Future<void> emptyTrash() async {
+    try {
+      DBHelper.multipleDelete('user_notes', 'isInTrash', 1);
+    } catch (err) {
+      throw (err);
+    }
+  }
 }

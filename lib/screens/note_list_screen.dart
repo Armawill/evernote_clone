@@ -163,10 +163,15 @@ class NoteListScreen extends StatelessWidget {
         },
         builder: (context, state) {
           if (state.isLoading) {
-            return const SliverFillRemaining(
-              child: Center(
-                child: CircularProgressIndicator(),
+            return _buildCustomScrollView(
+              context: context,
+              child: const SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
+              notes: [],
+              notebook: notebook,
             );
           }
           if ((state.isNoteListNotEmpty && notebook != TRASH) ||
