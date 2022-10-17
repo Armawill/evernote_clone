@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:evernote_clone/notebook/bloc/notebooks_bloc.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:evernote_clone/widgets/top_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -122,11 +123,15 @@ class NoteListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String notebook;
+    String notebookId, notebookTitle;
     try {
-      notebook = ModalRoute.of(context)!.settings.arguments as String;
+      notebookId = ModalRoute.of(context)!.settings.arguments as String;
+      notebookTitle = context.select((NotebooksBloc bloc) => bloc
+          .state.loadedNotebooks
+          .firstWhere((nb) => nb.id == notebookId)
+          .title);
     } catch (err) {
-      notebook = NOTES;
+      notebookTitle = NOTES;
     }
 
     // context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
@@ -171,11 +176,11 @@ class NoteListScreen extends StatelessWidget {
                 ),
               ),
               notes: [],
-              notebook: notebook,
+              notebook: notebookTitle,
             );
           }
-          if ((state.isNoteListNotEmpty && notebook != TRASH) ||
-              (state.isTrashListNotEmpty && notebook == TRASH)) {
+          if ((state.isNoteListNotEmpty && notebookTitle != TRASH) ||
+              (state.isTrashListNotEmpty && notebookTitle == TRASH)) {
             List<Note> notes = state.loadedNotes;
             notes.sort(
               (a, b) => b.date.compareTo(a.date),
@@ -189,7 +194,7 @@ class NoteListScreen extends StatelessWidget {
                       tiles: notes
                           .map((note) => NoteItem(
                                 note,
-                                notebook,
+                                notebookTitle,
                               ))
                           .toList(),
                       context: context,
@@ -197,10 +202,10 @@ class NoteListScreen extends StatelessWidget {
                   ),
                 ),
                 notes: notes,
-                notebook: notebook);
+                notebook: notebookTitle);
           }
-          if ((state.isNoteListEmpty && notebook != TRASH) ||
-              (state.isTrashListEmpty && notebook == TRASH)) {
+          if ((state.isNoteListEmpty && notebookTitle != TRASH) ||
+              (state.isTrashListEmpty && notebookTitle == TRASH)) {
             return _buildCustomScrollView(
                 context: context,
                 child: SliverFillRemaining(
@@ -248,19 +253,8 @@ class NoteListScreen extends StatelessWidget {
                   ),
                 ),
                 notes: [],
-                notebook: notebook);
+                notebook: notebookTitle);
           }
-          // if (state is NotesErrorState) {
-          //   return _buildCustomScrollView(
-          //       context: context,
-          //       child: const SliverFillRemaining(
-          //         child: Center(
-          //           child: Text('Something went wrong'),
-          //         ),
-          //       ),
-          //       notes: [],
-          //       notebook: notebook);
-          // }
           return _buildCustomScrollView(
               context: context,
               child: const SliverFillRemaining(
@@ -269,7 +263,7 @@ class NoteListScreen extends StatelessWidget {
                 ),
               ),
               notes: [],
-              notebook: notebook);
+              notebook: notebookTitle);
         },
       ),
       bottomNavigationBar: AppBottomAppBar(_openDrawer),
@@ -277,7 +271,7 @@ class NoteListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
-              arguments: {'notebookTitle': notebook});
+              arguments: {'notebookTitle': notebookTitle});
         },
         elevation: 0,
         tooltip: 'Add note',

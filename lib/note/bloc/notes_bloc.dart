@@ -119,8 +119,16 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       var nbIndex = repository.notebookList
           .indexWhere((nb) => nb.title == event.notebookTitle);
       if (nbIndex >= 0) {
-        emit(state.copyWith(
-            loadedNotes: List.from(repository.notebookList[nbIndex].noteList)));
+        List<Note> noteList = [];
+        for (var noteId in repository.notebookList[nbIndex].noteIdList) {
+          try {
+            noteList.add(
+                repository.noteList.firstWhere((note) => note.id == noteId));
+          } catch (err) {
+            log('Error in _onNotesFromNotebookShowed. $err');
+          }
+        }
+        emit(state.copyWith(loadedNotes: List.from(noteList)));
       }
     }
   }

@@ -172,7 +172,7 @@ class NotebookListScreen extends StatelessWidget {
                                             ShowNotesFromNotebook(nb.title));
                                         Navigator.of(context).pushNamed(
                                             NoteListScreen.routeName,
-                                            arguments: nb.title);
+                                            arguments: nb.id);
                                       },
                                       title: Container(
                                           height: 50,
@@ -191,7 +191,7 @@ class NotebookListScreen extends StatelessWidget {
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                        ' (${nb.noteList.length})',
+                                                        ' (${nb.noteIdList.length})',
                                                     style: TextStyle(
                                                       color: Colors.grey,
                                                       fontSize: 14,

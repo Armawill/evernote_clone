@@ -18,6 +18,7 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     on<RemoveNoteFromNotebookEvent>(_onNoteFromNotebookRemoved);
     on<AddNotebookEvent>(_onNotebookAdded);
     on<RemoveNotebookEvent>(_onNotebookRemoved);
+    on<RenameNotebookEvent>(_onNotebookRenamed);
   }
 
   Future<void> _onNotebooksLoaded(
@@ -55,7 +56,8 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     );
   }
 
-  void _onNoteToNotebookAdded(event, emit) {
+  void _onNoteToNotebookAdded(
+      AddNoteToNotebookEvent event, Emitter<NotebooksState> emit) {
     List<Notebook> notebooks = [];
     List<Notebook> temp = List.from(state.loadedNotebooks);
     for (int i = 0; i < temp.length; i++) {
@@ -63,47 +65,58 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     }
 
     var index = notebooks.indexWhere(
-      (nb) => nb.title == event.notebookName,
+      (nb) => nb.id == event.note.notebookId,
     );
 
     if (index >= 0) {
+      // repository.addNoteToNotebook(event.note.notebookId);
       var noteIndex = notebooks[index]
-          .noteList
-          .indexWhere((note) => note.id == event.note.id);
+          .noteIdList
+          .indexWhere((noteId) => noteId == event.note.id);
       if (noteIndex >= 0) {
-        notebooks
-            .elementAt(index)
-            .noteList
-            .replaceRange(noteIndex, noteIndex + 1, [event.note]);
+        notebooks.elementAt(index).noteIdList[noteIndex] = event.note.id;
       } else {
-        notebooks[index].noteList.add(event.note);
+        notebooks[index].noteIdList.add(event.note.id);
       }
       emit(state.copyWith(loadedNotebooks: notebooks));
     }
   }
 
-  void _onNoteFromNotebookRemoved(event, emit) {
+  void _onNoteFromNotebookRemoved(
+      RemoveNoteFromNotebookEvent event, Emitter<NotebooksState> emit) {
     List<Notebook> notebooks = [];
     List<Notebook> temp = List.from(state.loadedNotebooks);
     for (int i = 0; i < temp.length; i++) {
       notebooks.add(Notebook.clone(temp[i]));
     }
 
-    var nbIndex = notebooks.indexWhere(
-      (nb) => nb.title == event.notebookName,
+    var nbIndex = state.loadedNotebooks.indexWhere(
+      (nb) => nb.id == event.note.notebookId,
     );
 
     if (nbIndex >= 0) {
       var noteIndex = notebooks[nbIndex]
-          .noteList
-          .indexWhere((note) => note.id == event.note.id);
+          .noteIdList
+          .indexWhere((noteId) => noteId == event.note.id);
       if (noteIndex >= 0) {
-        notebooks[nbIndex].noteList.removeAt(noteIndex);
+        notebooks[nbIndex].noteIdList.removeAt(noteIndex);
       } else {
         log('Error from _onNoteFromNotebookRemoved: note isn\'t exsist');
       }
       emit(state.copyWith(loadedNotebooks: List.from(notebooks)));
     }
+  }
+
+  void _onNotebookRenamed(
+      RenameNotebookEvent event, Emitter<NotebooksState> emit) {
+    List<Notebook> loadedNotebooks = List.from(state.loadedNotebooks);
+    var index = loadedNotebooks.indexWhere((nb) => nb.title == event.oldTitle);
+    var notebook = Notebook.clone(loadedNotebooks[index]);
+    notebook.title = event.newTitle;
+    repository.renameNotebook(notebook.id, notebook.title);
+    emit(state.copyWith(
+        loadedNotebooks: loadedNotebooks
+          ..replaceRange(index, index + 1, [notebook])));
   }
 }
 

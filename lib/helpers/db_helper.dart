@@ -16,12 +16,12 @@ class DBHelper {
   static Future<void> _openDB(sql.Database db) async {
     // await db.execute('DROP TABLE user_notes');
     // db.execute(
-    //     'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT, isInTrash INTEGER)');
+    //     'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebookId TEXT, isInTrash INTEGER)');
   }
 
   static Future<void> _createDb(sql.Database db, int version) async {
     await db.execute(
-        'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebook TEXT, isInTrash INTEGER)');
+        'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, date TEXT, notebookId TEXT, isInTrash INTEGER)');
     await db.execute(
         'CREATE TABLE user_notebooks(id TEXT PRIMARY KEY, title TEXT)');
     await db.insert(
@@ -39,12 +39,12 @@ class DBHelper {
   }
 
   static Future<List<Map<String, dynamic>>> getNotesForNotebook(
-      String table, String notebook) async {
+      String table, String notebookId) async {
     final db = await DBHelper.database();
     return db.query(
       table,
-      where: 'notebook = ?',
-      whereArgs: [notebook],
+      where: 'notebookId = ?',
+      whereArgs: [notebookId],
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:evernote_clone/screens/add_notebook_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -53,16 +54,14 @@ class ModalBottomSheet extends StatelessWidget {
       var noteBloc = BlocProvider.of<NotesBloc>(context);
       var notebookBloc = BlocProvider.of<NotebooksBloc>(context);
       noteBloc.add(MoveNoteToTrashEvent(note!));
-      notebookBloc.add(RemoveNoteFromNotebookEvent(note!, note!.notebook));
+      notebookBloc.add(RemoveNoteFromNotebookEvent(note!));
     }
   }
 
   void _restoreNote(BuildContext context) {
     if (note != null) {
       context.read<NotesBloc>().add(RestoreNoteFromTrash(note!));
-      context
-          .read<NotebooksBloc>()
-          .add(AddNoteToNotebookEvent(note!, note!.notebook));
+      context.read<NotebooksBloc>().add(AddNoteToNotebookEvent(note!));
     }
   }
 
@@ -216,7 +215,12 @@ class ModalBottomSheet extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              AddNotebookScreen.routeName,
+              arguments: notebookTitle,
+            );
+          },
         ),
         ListTile(
           leading: Icon(

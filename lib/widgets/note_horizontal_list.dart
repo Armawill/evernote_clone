@@ -21,17 +21,14 @@ class NoteHorizontalList extends StatelessWidget {
           if ((previous.loadedNotes.length > current.loadedNotes.length) &&
               (previous.trashNotesList.length <
                   current.trashNotesList.length)) {
-            // setState(() {
             _wasMovedToTrash = !_wasMovedToTrash;
-            // });
+
             return true;
           } else if ((previous.loadedNotes.length >
                   current.loadedNotes.length) &&
               (previous.trashNotesList.length >
                   current.trashNotesList.length)) {
-            // setState(() {
             _wasRestored = !_wasRestored;
-            // });
             return true;
           } else {
             return false;

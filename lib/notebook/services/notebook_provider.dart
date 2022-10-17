@@ -14,7 +14,7 @@ class NotebookProvider {
           .toList();
       for (int i = 0; i < notebooksLoaded.length; i++) {
         final data = await DBHelper.getNotesForNotebook(
-            'user_notes', notebooksLoaded[i].title);
+            'user_notes', notebooksLoaded[i].id);
         final noteList = data
             .map(
               (note) => Note(
@@ -22,14 +22,18 @@ class NotebookProvider {
                 title: note['title'],
                 text: note['text'],
                 date: DateTime.parse(note['date']),
-                notebook: note['notebook'],
+                notebookId: note['notebookId'],
                 isInTrash: note['isInTrash'] == 0 ? false : true,
               ),
             )
             .toList();
         noteList.removeWhere((note) => note.isInTrash);
+        List<String> noteIdList = [];
+        for (var note in noteList) {
+          noteIdList.add(note.id);
+        }
 
-        notebooksLoaded[i].noteList.addAll(noteList);
+        notebooksLoaded[i].noteIdList.addAll(noteIdList);
       }
       return notebooksLoaded;
     } catch (err) {
@@ -37,7 +41,7 @@ class NotebookProvider {
     }
   }
 
-  Future<void> addNotebook(Notebook notebook) async {
+  Future<void> saveNotebook(Notebook notebook) async {
     try {
       DBHelper.insert('user_notebooks', {
         'id': notebook.id,

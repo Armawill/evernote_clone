@@ -23,7 +23,7 @@ class NoteCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
-              arguments: {'note': note});
+              arguments: {'note': note, 'notebookId': note.notebookId});
         },
         splashFactory: NoSplash.splashFactory,
         child: Container(

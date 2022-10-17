@@ -16,7 +16,7 @@ class NoteItem extends StatelessWidget {
       onTap: () {
         Navigator.of(context).pushNamed(
           NoteDetailsScreen.routeName,
-          arguments: {'note': note, 'notebookTitle': _notebookTitle},
+          arguments: {'note': note, 'notebookId': _notebookTitle},
         );
       },
       title: Container(

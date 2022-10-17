@@ -17,7 +17,7 @@ class NoteProvider {
               title: note['title'],
               text: note['text'],
               date: DateTime.parse(note['date']),
-              notebook: note['notebook'],
+              notebookId: note['notebookId'],
               isInTrash: note['isInTrash'] == 0 ? false : true,
             ))
         .toList();
@@ -37,7 +37,7 @@ class NoteProvider {
           'title': note.title,
           'text': note.text,
           'date': note.date.toIso8601String(),
-          'notebook': note.notebook,
+          'notebookId': note.notebookId,
           'isInTrash': note.isInTrash ? 1 : 0,
         },
       );

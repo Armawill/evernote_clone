@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
+import 'package:evernote_clone/repository.dart';
 import 'package:evernote_clone/screens/note_list_screen.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -43,16 +44,16 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     super.dispose();
   }
 
-  void _saveNote(BuildContext ctx) {
+  Future<void> _saveNote(BuildContext ctx, String nbTitle) async {
     var noteBloc = BlocProvider.of<NotesBloc>(ctx);
     var notebookBloc = BlocProvider.of<NotebooksBloc>(ctx);
     _form.currentState!.save();
-    _editedNote = Note.verify(_editedNote);
+    _editedNote =
+        await context.read<Repository>().verifyNote(_editedNote, nbTitle);
     editModeOff();
 
-    _editedNote.date = DateTime.now();
     noteBloc.add(AddNoteEvent(_editedNote));
-    notebookBloc.add(AddNoteToNotebookEvent(_editedNote, _editedNote.notebook));
+    notebookBloc.add(AddNoteToNotebookEvent(_editedNote));
   }
 
   void editModeOn() {
@@ -88,6 +89,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String notebookTitle = '';
     if (ModalRoute.of(context)?.settings.arguments != null) {
       var data =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -95,19 +97,29 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       var nbTitle = data['notebookTitle'];
       if (note is Note) {
         _editedNote = note;
-      } else {
-        if (nbTitle is String) {
-          if (nbTitle == 'Notes') {
-            nbTitle = 'Interesting';
-          }
-          _editedNote.notebook = nbTitle;
+      }
+
+      if (nbTitle is String) {
+        if (nbTitle == 'Notes') {
+          nbTitle = 'Interesting';
         }
+        notebookTitle = nbTitle;
+        var nbList = List.from(context.read<Repository>().notebookList);
+        var nbIndex = nbList.indexWhere((nb) => nb.title == nbTitle);
+        _editedNote.notebookId = nbList[nbIndex].id;
       }
     }
+
+    if (notebookTitle.isEmpty) {
+      var nbList = List.from(context.read<Repository>().notebookList);
+      var nbIndex = nbList.indexWhere((nb) => nb.id == _editedNote.notebookId);
+      notebookTitle = nbList[nbIndex].title;
+    }
+
     return WillPopScope(
       onWillPop: () async {
         if (_isEditing) {
-          _saveNote(context);
+          _saveNote(context, notebookTitle);
           return false;
         } else {
           return true;
@@ -123,7 +135,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                 )
               : IconButton(
                   onPressed: () {
-                    _saveNote(context);
+                    _saveNote(context, notebookTitle);
                   },
                   icon: Icon(
                     Icons.check,
@@ -152,7 +164,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     color: Colors.grey[400],
                   ),
                   Text(
-                    _editedNote.isInTrash ? TRASH : _editedNote.notebook,
+                    _editedNote.isInTrash ? TRASH : notebookTitle,
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                 ],
@@ -179,7 +191,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         title: value!,
                         text: _editedNote.text,
                         date: _editedNote.date,
-                        notebook: _editedNote.notebook,
+                        notebookId: _editedNote.notebookId,
                       );
                       _focusTitle.unfocus();
                     },
@@ -201,7 +213,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         title: _editedNote.title,
                         text: value!,
                         date: _editedNote.date,
-                        notebook: _editedNote.notebook,
+                        notebookId: _editedNote.notebookId,
                       );
                       _focusText.unfocus();
                     },

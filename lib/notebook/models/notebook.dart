@@ -4,8 +4,8 @@ import '../../note/note.dart';
 
 class Notebook extends Equatable {
   final String id;
-  final String title;
-  final List<Note> noteList = [];
+  String title;
+  final List<String> noteIdList = [];
 
   Notebook({required this.id, required this.title});
 
@@ -13,9 +13,9 @@ class Notebook extends Equatable {
   Notebook.clone(Notebook source)
       : id = source.id,
         title = source.title {
-    noteList.addAll(List.from(source.noteList));
+    noteIdList.addAll(List.from(source.noteIdList));
   }
 
   @override
-  List<Object?> get props => [id, title, noteList];
+  List<Object?> get props => [id, title, noteIdList];
 }

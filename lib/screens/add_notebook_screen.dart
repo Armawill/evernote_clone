@@ -12,39 +12,58 @@ class AddNotebookScreen extends StatefulWidget {
 }
 
 class _AddNotebookScreenState extends State<AddNotebookScreen> {
-  final _controller = TextEditingController();
+  bool _isExist = false;
+
+  String _newTitile = '';
 
   final _formKey = GlobalKey<FormState>();
-
-  String title = '';
-
-  bool _isExist = false;
 
   @override
   Widget build(BuildContext context) {
     var notebookBloc = BlocProvider.of<NotebooksBloc>(context);
+    var data = ModalRoute.of(context)!.settings.arguments;
+    var oldTitle = '';
+    if (data != null) {
+      oldTitle = data as String;
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
-            onPressed: _controller.text.isEmpty || _isExist
+            onPressed: _newTitile.isEmpty || _isExist
                 ? null
-                : () {
-                    var notebookBloc = BlocProvider.of<NotebooksBloc>(context);
-                    notebookBloc.add(AddNotebookEvent(_controller.text.trim()));
-                    Navigator.pop(context);
-                  },
-            child: const Text(
-              'Create',
-              style: TextStyle(fontSize: 18),
-            ),
+                : oldTitle.isEmpty
+                    ? () {
+                        var notebookBloc =
+                            BlocProvider.of<NotebooksBloc>(context);
+                        notebookBloc.add(AddNotebookEvent(_newTitile.trim()));
+                        Navigator.pop(context);
+                      }
+                    : () {
+                        var notebookBloc =
+                            BlocProvider.of<NotebooksBloc>(context);
+                        notebookBloc
+                            .add(RenameNotebookEvent(oldTitle, _newTitile));
+                        Navigator.pop(context);
+                      },
+            child: oldTitle.isEmpty
+                ? const Text(
+                    'Create',
+                    style: TextStyle(fontSize: 18),
+                  )
+                : const Text(
+                    'Rename',
+                    style: TextStyle(fontSize: 18),
+                  ),
           )
         ],
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _controller,
+          TextFormField(
+            key: _formKey,
+            initialValue: oldTitle,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -62,17 +81,18 @@ class _AddNotebookScreenState extends State<AddNotebookScreen> {
               border: const OutlineInputBorder(borderSide: BorderSide.none),
             ),
             onChanged: (value) {
+              value = value.trim();
               var index = notebookBloc.state.loadedNotebooks
-                  .indexWhere((nb) => nb.title == value.trim());
+                  .indexWhere((nb) => (nb.title == value && value != oldTitle));
               if (index >= 0) {
                 setState(() {
                   _isExist = true;
-                  title = value;
+                  _newTitile = value;
                 });
               } else {
                 setState(() {
                   _isExist = false;
-                  title = '';
+                  _newTitile = value;
                 });
               }
             },
@@ -96,7 +116,7 @@ class _AddNotebookScreenState extends State<AddNotebookScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 13, vertical: 10),
               child: Text(
-                'Error: There is already a notebook named "$title". Please use a unique name.',
+                'Error: There is already a notebook named "${_newTitile}". Please use a unique name.',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 15,

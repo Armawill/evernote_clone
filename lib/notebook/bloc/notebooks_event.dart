@@ -11,22 +11,20 @@ class NotebooksLoadEvent extends NotebookEvent {}
 
 class AddNoteToNotebookEvent extends NotebookEvent {
   final Note note;
-  final String notebookName;
 
-  const AddNoteToNotebookEvent(this.note, this.notebookName);
+  const AddNoteToNotebookEvent(this.note);
 
   @override
-  List<Object> get props => [note, notebookName];
+  List<Object> get props => [note];
 }
 
 class RemoveNoteFromNotebookEvent extends NotebookEvent {
   final Note note;
-  final String notebookName;
 
-  const RemoveNoteFromNotebookEvent(this.note, this.notebookName);
+  const RemoveNoteFromNotebookEvent(this.note);
 
   @override
-  List<Object> get props => [note, notebookName];
+  List<Object> get props => [note];
 }
 
 class AddNotebookEvent extends NotebookEvent {
@@ -45,4 +43,14 @@ class RemoveNotebookEvent extends NotebookEvent {
 
   @override
   List<Object> get props => [notebookTitle];
+}
+
+class RenameNotebookEvent extends NotebookEvent {
+  final String oldTitle;
+  final String newTitle;
+
+  const RenameNotebookEvent(this.oldTitle, this.newTitle);
+
+  @override
+  List<Object> get props => [oldTitle, newTitle];
 }

@@ -3,6 +3,8 @@ import 'dart:developer';
 import './note/note.dart';
 import './notebook/notebook.dart';
 
+const String interesting = 'Interesting';
+
 class Repository {
   final NoteProvider _noteProvider = NoteProvider();
   final NotebookProvider _notebookProvider = NotebookProvider();
@@ -12,23 +14,33 @@ class Repository {
   final List<Note> trashList = [];
 
   Future<void> getNotebooks() async {
-    var nbList = await _notebookProvider.fetchNotebooks();
-    notebookList.addAll(nbList);
+    if (notebookList.isEmpty) {
+      var nbList = await _notebookProvider.fetchNotebooks();
+      notebookList.addAll(nbList);
+    }
   }
 
   Future<void> addNotebook(Notebook notebook) async {
     notebookList.add(notebook);
-    await _notebookProvider.addNotebook(notebook);
+    await _notebookProvider.saveNotebook(notebook);
   }
 
   void deleteNotebook(String notebookTitle) async {
     var notebook = notebookList.firstWhere((nb) => nb.title == notebookTitle);
-    for (var note in notebook.noteList) {
-      moveNoteToTrash(note, true);
+    for (var noteId in notebook.noteIdList) {
+      moveNoteToTrash(noteList.firstWhere((note) => note.id == noteId), true);
     }
 
     notebookList.removeWhere((nb) => nb.id == notebook.id);
     await _notebookProvider.deleteNotebook(notebook.id);
+  }
+
+  Future<void> renameNotebook(String id, String newTitle) async {
+    var index = notebookList.indexWhere((nb) => nb.id == id);
+    if (index >= 0) {
+      notebookList[index].title = newTitle;
+    }
+    await _notebookProvider.saveNotebook(Notebook(id: id, title: newTitle));
   }
 
   Future<void> getNotes() async {
@@ -42,28 +54,45 @@ class Repository {
         return note.isInTrash;
       },
     );
-  }
-
-  Future<void> addNote(Note editedNote) async {
     if (notebookList.isEmpty) {
       await getNotebooks();
     }
-    await _noteProvider.saveNote(editedNote);
+  }
+
+  Future<Note> verifyNote(Note source, String nbTitle) async {
+    String id = source.id, title = source.title, notebookId = source.notebookId;
+    if (source.id.isEmpty) {
+      id = DateTime.now().toString();
+    }
+    if (source.title.isEmpty) {
+      title = 'Untitled note';
+    }
+    if (source.notebookId.isEmpty) {
+      notebookId = notebookList.firstWhere((nb) => nb.title == nbTitle).id;
+    }
+
+    return Note(
+        id: id,
+        title: title,
+        text: source.text,
+        date: DateTime.now(),
+        notebookId: notebookId);
+  }
+
+  Future<void> addNote(Note editedNote) async {
     var noteIndex = noteList.indexWhere((note) => note.id == editedNote.id);
-    var nbIndex =
-        notebookList.indexWhere((nb) => nb.title == editedNote.notebook);
+
     if (noteIndex >= 0) {
       noteList[noteIndex] = editedNote;
-      noteIndex = notebookList[nbIndex]
-          .noteList
-          .indexWhere((note) => note.id == editedNote.id);
-      if (noteIndex >= 0) {
-        notebookList[nbIndex].noteList[noteIndex] = editedNote;
-      }
     } else {
       noteList.add(editedNote);
-      notebookList[nbIndex].noteList.add(editedNote);
+      var nbIndex =
+          notebookList.indexWhere((nb) => nb.id == editedNote.notebookId);
+      if (nbIndex >= 0) {
+        notebookList[nbIndex].noteIdList.add(editedNote.id);
+      }
     }
+    await _noteProvider.saveNote(editedNote);
   }
 
   Future<void> deleteNote(String id) async {
@@ -73,16 +102,16 @@ class Repository {
 
   ///Moves [note] to trash, [willNotebookDelete] should specified as true, when notebook from which is deleting [note], will also deleted
   void moveNoteToTrash(Note note, [bool willNotebookDelete = false]) async {
-    if (notebookList.isEmpty) {
-      await getNotebooks();
-    }
     note.isInTrash = true;
     note.date = DateTime.now();
 
     if (!willNotebookDelete) {
-      note.notebook = 'Interesting';
-      var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);
-      notebookList[nbIndex].noteList.removeWhere((n) => n.id == note.id);
+      note.notebookId =
+          notebookList.first.id; // It must be notebook with title 'Interesting'
+      var nbIndex = notebookList.indexWhere((nb) => nb.id == note.notebookId);
+      notebookList[nbIndex]
+          .noteIdList
+          .removeWhere((noteId) => noteId == note.id);
     }
     trashList.add(note);
     noteList.removeWhere((n) => n.id == note.id);
@@ -90,19 +119,16 @@ class Repository {
   }
 
   void restoreNote(Note note) async {
-    if (notebookList.isEmpty) {
-      await getNotebooks();
-    }
     note.isInTrash = false;
     note.date = DateTime.now();
-    var nbIndex = notebookList.indexWhere((nb) => nb.title == note.notebook);
+    var nbIndex = notebookList.indexWhere((nb) => nb.id == note.notebookId);
     if (nbIndex >= 0) {
       await _noteProvider.saveNote(note);
-      notebookList[nbIndex].noteList.add(note);
+      notebookList[nbIndex].noteIdList.add(note.id);
     } else {
+      note.notebookId = notebookList.first.title; // Notebook 'Interesting'
       await _noteProvider.saveNote(note);
-      note.notebook = notebookList.first.title; // Notebook 'Interesting'
-      notebookList.first.noteList.add(note);
+      notebookList.first.noteIdList.add(note.id);
     }
     trashList.removeWhere((n) => n.id == note.id);
     noteList.add(note);
