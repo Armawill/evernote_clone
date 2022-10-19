@@ -69,16 +69,15 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
     );
 
     if (index >= 0) {
-      // repository.addNoteToNotebook(event.note.notebookId);
-      var noteIndex = notebooks[index]
-          .noteIdList
-          .indexWhere((noteId) => noteId == event.note.id);
-      if (noteIndex >= 0) {
-        notebooks.elementAt(index).noteIdList[noteIndex] = event.note.id;
-      } else {
-        notebooks[index].noteIdList.add(event.note.id);
-      }
-      emit(state.copyWith(loadedNotebooks: notebooks));
+      // var noteIndex = notebooks[index]
+      //     .noteIdList
+      //     .indexWhere((noteId) => noteId == event.note.id);
+      // if (noteIndex >= 0) {
+      //   notebooks.elementAt(index).noteIdList[noteIndex] = event.note.id;
+      // } else {
+      notebooks[index].noteIdList.add(event.note.id);
+      // }
+      emit(state.copyWith(loadedNotebooks: List.from(notebooks)));
     }
   }
 

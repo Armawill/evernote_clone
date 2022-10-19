@@ -114,7 +114,10 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     if (event.notebookTitle == 'Notes') {
       emit(state.copyWith(loadedNotes: List.from(repository.noteList)));
     } else if (event.notebookTitle == 'Trash') {
-      emit(state.copyWith(loadedNotes: List.from(repository.trashList)));
+      emit(state.copyWith(
+        loadedNotes: List.from(repository.trashList),
+        trashNotesList: List.from(repository.trashList),
+      ));
     } else {
       var nbIndex = repository.notebookList
           .indexWhere((nb) => nb.title == event.notebookTitle);

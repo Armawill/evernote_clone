@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:evernote_clone/notebook/bloc/notebooks_bloc.dart';
+import 'package:evernote_clone/widgets/app_floating_action_button.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:evernote_clone/widgets/top_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -123,161 +124,170 @@ class NoteListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String notebookId, notebookTitle;
-    try {
+    String notebookId, notebookTitle = '';
+
+    if (ModalRoute.of(context)!.settings.arguments != null) {
       notebookId = ModalRoute.of(context)!.settings.arguments as String;
-      notebookTitle = context.select((NotebooksBloc bloc) => bloc
-          .state.loadedNotebooks
-          .firstWhere((nb) => nb.id == notebookId)
-          .title);
-    } catch (err) {
+      var nbIndex = context
+          .read<NotebooksBloc>()
+          .state
+          .loadedNotebooks
+          .indexWhere((nb) => nb.id == notebookId);
+      if (nbIndex >= 0) {
+        var loadedNotebooks =
+            context.select((NotebooksBloc bloc) => bloc.state.loadedNotebooks);
+        notebookTitle = loadedNotebooks[nbIndex].title;
+      } else {
+        notebookTitle = TRASH;
+      }
+    } else {
       notebookTitle = NOTES;
     }
-
-    // context.read<NotesBloc>().add(ShowNotesFromNotebook(notebook));
+    // if (notebookTitle.isEmpty &&
+    //     context.read<NotesBloc>().state.loadedNotes.first.isInTrash) {
+    //   notebookTitle = TRASH;
+    // }
 
     return Scaffold(
-      key: _scaffoldKey,
-      drawer: AppDrawer(),
-      body: BlocConsumer<NotesBloc, NotesState>(
-        listenWhen: (previous, current) {
-          if ((previous.loadedNotes.length > current.loadedNotes.length) &&
-              (previous.trashNotesList.length <
-                  current.trashNotesList.length)) {
-            _wasMovedToTrash = !_wasMovedToTrash;
+        key: _scaffoldKey,
+        drawer: AppDrawer(),
+        body: BlocConsumer<NotesBloc, NotesState>(
+          listenWhen: (previous, current) {
+            if ((previous.loadedNotes.length > current.loadedNotes.length) &&
+                (previous.trashNotesList.length <
+                    current.trashNotesList.length)) {
+              _wasMovedToTrash = !_wasMovedToTrash;
 
-            return true;
-          } else if ((previous.loadedNotes.length >
-                  current.loadedNotes.length) &&
-              (previous.trashNotesList.length >
-                  current.trashNotesList.length)) {
-            _wasRestored = !_wasRestored;
+              return true;
+            } else if ((previous.loadedNotes.length >
+                    current.loadedNotes.length) &&
+                (previous.trashNotesList.length >
+                    current.trashNotesList.length)) {
+              _wasRestored = !_wasRestored;
 
-            return true;
-          } else {
-            return false;
-          }
-        },
-        listener: (context, state) {
-          if (_wasMovedToTrash) {
-            TopSnackBar.deleteNote(context).show(context);
-          }
-          if (_wasRestored) {
-            TopSnackBar.restoreNote(context).show(context);
-          }
-        },
-        builder: (context, state) {
-          if (state.isLoading) {
-            return _buildCustomScrollView(
-              context: context,
-              child: const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-              notes: [],
-              notebook: notebookTitle,
-            );
-          }
-          if ((state.isNoteListNotEmpty && notebookTitle != TRASH) ||
-              (state.isTrashListNotEmpty && notebookTitle == TRASH)) {
-            List<Note> notes = state.loadedNotes;
-            notes.sort(
-              (a, b) => b.date.compareTo(a.date),
-            );
-
-            return _buildCustomScrollView(
+              return true;
+            } else {
+              return false;
+            }
+          },
+          listener: (context, state) {
+            if (_wasMovedToTrash) {
+              TopSnackBar.deleteNote(context).show(context);
+            }
+            if (_wasRestored) {
+              TopSnackBar.restoreNote(context).show(context);
+            }
+          },
+          builder: (context, state) {
+            if (state.isLoading) {
+              return _buildCustomScrollView(
                 context: context,
-                child: SliverList(
-                  delegate: SliverChildListDelegate(
-                    ListTile.divideTiles(
-                      tiles: notes
-                          .map((note) => NoteItem(
-                                note,
-                                notebookTitle,
-                              ))
-                          .toList(),
-                      context: context,
-                    ).toList(),
+                child: const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-                notes: notes,
-                notebook: notebookTitle);
-          }
-          if ((state.isNoteListEmpty && notebookTitle != TRASH) ||
-              (state.isTrashListEmpty && notebookTitle == TRASH)) {
+                notes: [],
+                notebook: notebookTitle,
+              );
+            }
+            if ((state.isNoteListNotEmpty && notebookTitle != TRASH) ||
+                (state.isTrashListNotEmpty && notebookTitle == TRASH)) {
+              List<Note> notes;
+              if (notebookTitle == TRASH) {
+                notes = state.trashNotesList;
+              } else {
+                notes = state.loadedNotes;
+              }
+
+              notes.sort(
+                (a, b) => b.date.compareTo(a.date),
+              );
+
+              return _buildCustomScrollView(
+                  context: context,
+                  child: SliverList(
+                    delegate: SliverChildListDelegate(
+                      ListTile.divideTiles(
+                        tiles: notes
+                            .map((note) => NoteItem(
+                                  note,
+                                  notebookTitle,
+                                ))
+                            .toList(),
+                        context: context,
+                      ).toList(),
+                    ),
+                  ),
+                  notes: notes,
+                  notebook: notebookTitle);
+            }
+            if ((state.isNoteListEmpty && notebookTitle != TRASH) ||
+                (state.isTrashListEmpty && notebookTitle == TRASH)) {
+              return _buildCustomScrollView(
+                  context: context,
+                  child: SliverFillRemaining(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) => Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: constraints.maxHeight * 0.15),
+                            child: Image.asset(
+                              'assets/images/empty_note_list.png',
+                              fit: BoxFit.cover,
+                              height: constraints.maxHeight * 0.25,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            'No notes yet',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: constraints.maxWidth * 0.6,
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 16),
+                                children: [
+                                  const TextSpan(text: 'Tap the '),
+                                  TextSpan(
+                                      text: '+ New',
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                  const TextSpan(
+                                      text: ' button to create a note'),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  notes: [],
+                  notebook: notebookTitle);
+            }
             return _buildCustomScrollView(
                 context: context,
-                child: SliverFillRemaining(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) => Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: constraints.maxHeight * 0.15),
-                          child: Image.asset(
-                            'assets/images/empty_note_list.png',
-                            fit: BoxFit.cover,
-                            height: constraints.maxHeight * 0.25,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        const Text(
-                          'No notes yet',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          width: constraints.maxWidth * 0.6,
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 16),
-                              children: [
-                                const TextSpan(text: 'Tap the '),
-                                TextSpan(
-                                    text: '+ New',
-                                    style: TextStyle(
-                                        color: Theme.of(context).primaryColor)),
-                                const TextSpan(
-                                    text: ' button to create a note'),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      ],
-                    ),
+                child: const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
                 ),
                 notes: [],
                 notebook: notebookTitle);
-          }
-          return _buildCustomScrollView(
-              context: context,
-              child: const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-              notes: [],
-              notebook: notebookTitle);
-        },
-      ),
-      bottomNavigationBar: AppBottomAppBar(_openDrawer),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
-              arguments: {'notebookTitle': notebookTitle});
-        },
-        elevation: 0,
-        tooltip: 'Add note',
-        icon: const Icon(Icons.add),
-        label: const Text('New'),
-      ),
-    );
+          },
+        ),
+        bottomNavigationBar: AppBottomAppBar(_openDrawer),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: AppFloatingActionButton(
+            notebookTitle: notebookTitle == TRASH ? 'Notes' : notebookTitle));
   }
 }

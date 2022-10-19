@@ -1,4 +1,5 @@
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
+import 'package:evernote_clone/widgets/app_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -145,14 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).pushNamed(NoteDetailsScreen.routeName);
-        },
-        elevation: 0,
-        tooltip: 'Add note',
-        icon: const Icon(Icons.add),
-        label: Text('New'),
+      floatingActionButton: const AppFloatingActionButton(
+        notebookTitle: 'Notes',
       ),
     );
   }

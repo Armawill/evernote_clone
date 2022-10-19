@@ -53,7 +53,9 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Trash'),
                 onTap: () {
                   _pop(context);
-                  context.read<NotesBloc>().add(ShowNotesFromNotebook('Trash'));
+                  context
+                      .read<NotesBloc>()
+                      .add(const ShowNotesFromNotebook('Trash'));
                   Navigator.of(context).pushReplacementNamed(
                       NoteListScreen.routeName,
                       arguments: 'Trash');

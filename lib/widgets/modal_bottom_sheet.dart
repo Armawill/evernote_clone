@@ -38,8 +38,10 @@ class ModalBottomSheet extends StatelessWidget {
   }
 
   void _deleteNotebook(BuildContext context, String notebook) {
-    context.read<NotebooksBloc>().add(RemoveNotebookEvent(notebook));
+    // Navigator.pop(context);
+    // Navigator.pop(context);
     Navigator.of(context).pushReplacementNamed(NotebookListScreen.routeName);
+    context.read<NotebooksBloc>().add(RemoveNotebookEvent(notebook));
   }
 
   void _deleteNote(BuildContext context) {

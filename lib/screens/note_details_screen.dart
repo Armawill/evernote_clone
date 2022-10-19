@@ -106,11 +106,15 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         notebookTitle = nbTitle;
         var nbList = List.from(context.read<Repository>().notebookList);
         var nbIndex = nbList.indexWhere((nb) => nb.title == nbTitle);
-        _editedNote.notebookId = nbList[nbIndex].id;
+        if (nbIndex >= 0) {
+          _editedNote.notebookId = nbList[nbIndex].id;
+        } else {
+          log('Error in NoteDetailsScreen');
+        }
       }
     }
 
-    if (notebookTitle.isEmpty) {
+    if (notebookTitle.isEmpty && !_editedNote.isInTrash) {
       var nbList = List.from(context.read<Repository>().notebookList);
       var nbIndex = nbList.indexWhere((nb) => nb.id == _editedNote.notebookId);
       notebookTitle = nbList[nbIndex].title;

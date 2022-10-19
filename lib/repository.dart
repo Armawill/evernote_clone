@@ -9,8 +9,13 @@ class Repository {
   final NoteProvider _noteProvider = NoteProvider();
   final NotebookProvider _notebookProvider = NotebookProvider();
 
+  /// [noteList] is a list of all notes, except notes where isInTrash is true
   final List<Note> noteList = [];
+
+  /// [notebookList] is a list of notebooks
   final List<Notebook> notebookList = [];
+
+  /// [trashList] is a list of notes where [isInTrash] is true
   final List<Note> trashList = [];
 
   Future<void> getNotebooks() async {
@@ -102,36 +107,50 @@ class Repository {
 
   ///Moves [note] to trash, [willNotebookDelete] should specified as true, when notebook from which is deleting [note], will also deleted
   void moveNoteToTrash(Note note, [bool willNotebookDelete = false]) async {
-    note.isInTrash = true;
-    note.date = DateTime.now();
+    var editedNote = Note(
+      id: note.id,
+      title: note.title,
+      text: note.text,
+      date: DateTime.now(),
+      notebookId: note.notebookId,
+      isInTrash: true,
+    );
 
-    if (!willNotebookDelete) {
-      note.notebookId =
+    if (willNotebookDelete) {
+      editedNote.notebookId =
           notebookList.first.id; // It must be notebook with title 'Interesting'
-      var nbIndex = notebookList.indexWhere((nb) => nb.id == note.notebookId);
+    } else {
+      var nbIndex =
+          notebookList.indexWhere((nb) => nb.id == editedNote.notebookId);
       notebookList[nbIndex]
           .noteIdList
-          .removeWhere((noteId) => noteId == note.id);
+          .removeWhere((noteId) => noteId == editedNote.id);
     }
-    trashList.add(note);
-    noteList.removeWhere((n) => n.id == note.id);
-    _noteProvider.saveNote(note);
+    trashList.add(editedNote);
+    noteList.removeWhere((n) => n.id == editedNote.id);
+    _noteProvider.saveNote(editedNote);
   }
 
   void restoreNote(Note note) async {
-    note.isInTrash = false;
-    note.date = DateTime.now();
-    var nbIndex = notebookList.indexWhere((nb) => nb.id == note.notebookId);
+    var editedNote = Note(
+      id: note.id,
+      title: note.title,
+      text: note.text,
+      date: DateTime.now(),
+      notebookId: note.notebookId,
+      isInTrash: false,
+    );
+    var nbIndex =
+        notebookList.indexWhere((nb) => nb.id == editedNote.notebookId);
     if (nbIndex >= 0) {
-      await _noteProvider.saveNote(note);
-      notebookList[nbIndex].noteIdList.add(note.id);
+      notebookList[nbIndex].noteIdList.add(editedNote.id);
     } else {
-      note.notebookId = notebookList.first.title; // Notebook 'Interesting'
-      await _noteProvider.saveNote(note);
-      notebookList.first.noteIdList.add(note.id);
+      editedNote.notebookId = notebookList.first.id; // Notebook 'Interesting'
+      notebookList.first.noteIdList.add(editedNote.id);
     }
-    trashList.removeWhere((n) => n.id == note.id);
-    noteList.add(note);
+    await _noteProvider.saveNote(editedNote);
+    trashList.removeWhere((n) => n.id == editedNote.id);
+    noteList.add(editedNote);
   }
 
   void emptyTrash() {
