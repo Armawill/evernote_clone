@@ -46,7 +46,7 @@ class NoteItem extends StatelessWidget {
               ],
             ),
             Text(
-              DateTimeHelper.getDate(note.date),
+              DateTimeHelper.getDate(note.dateUpdated),
               style: TextStyle(color: Colors.grey),
             ),
           ],

@@ -201,7 +201,7 @@ class NoteListScreen extends StatelessWidget {
               }
 
               notes.sort(
-                (a, b) => b.date.compareTo(a.date),
+                (a, b) => b.dateUpdated.compareTo(a.dateUpdated),
               );
 
               return _buildCustomScrollView(

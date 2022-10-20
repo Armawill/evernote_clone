@@ -50,7 +50,7 @@ class NoteHorizontalList extends StatelessWidget {
           }
           if (state.isNoteListNotEmpty) {
             state.loadedNotes.sort(
-              (a, b) => b.date.compareTo(a.date),
+              (a, b) => b.dateUpdated.compareTo(a.dateUpdated),
             );
             var notes = state.loadedNotes;
             int notesLength = notes.length;

@@ -46,19 +46,13 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
 
   void _onNoteAdded(AddNoteEvent event, Emitter<NotesState> emit) {
     List<Note> loadedNotes = List.from(state.loadedNotes);
-    var editedNote = event.note;
-    // if (editedNote.title.isEmpty) {
-    //   editedNote.title = 'Untitled note';
-    // }
-    // if (event.note.id.isEmpty) {
-    //   editedNote = Note(
-    //     id: DateTime.now().toString(),
-    //     title: editedNote.title,
-    //     text: editedNote.text,
-    //     date: editedNote.date,
-    //     notebook: editedNote.notebook,
-    //   );
-    // }
+    var editedNote = Note(
+        id: event.note.id,
+        title: event.note.title,
+        text: event.note.text,
+        dateCreated: event.note.dateCreated,
+        dateUpdated: DateTime.now(),
+        notebookId: event.note.notebookId);
 
     var noteIndex = loadedNotes.indexWhere(
       (note) => note.id == editedNote.id,

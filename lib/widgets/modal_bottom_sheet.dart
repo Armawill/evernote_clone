@@ -1,4 +1,6 @@
+import 'package:evernote_clone/helpers/screen_arguments.dart';
 import 'package:evernote_clone/screens/add_notebook_screen.dart';
+import 'package:evernote_clone/screens/note_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -303,6 +305,21 @@ class ModalBottomSheet extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        ListTile(
+          leading: Icon(
+            Icons.info_outline,
+          ),
+          title: Text(
+            'Note info',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          onTap: () {
+            Navigator.of(context).pushNamed(NoteInfoScreen.routeName,
+                arguments: ScreenArguments(note!.id));
+          },
+        ),
         ListTile(
           leading: Icon(
             Icons.find_in_page_outlined,

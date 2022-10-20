@@ -4,7 +4,8 @@ class Note extends Equatable {
   final String id;
   String title;
   String text;
-  DateTime date;
+  DateTime dateCreated;
+  DateTime dateUpdated;
   String notebookId;
   bool isInTrash;
 
@@ -12,7 +13,8 @@ class Note extends Equatable {
     required this.id,
     required this.title,
     required this.text,
-    required this.date,
+    required this.dateCreated,
+    required this.dateUpdated,
     required this.notebookId,
     this.isInTrash = false,
   });
@@ -21,10 +23,12 @@ class Note extends Equatable {
       : id = '',
         title = '',
         text = '',
-        date = DateTime.now(),
+        dateCreated = DateTime.now(),
+        dateUpdated = DateTime.now(),
         notebookId = '',
         isInTrash = false;
 
   @override
-  List<Object?> get props => [id, title, text, date, notebookId, isInTrash];
+  List<Object?> get props =>
+      [id, title, text, dateCreated, dateUpdated, notebookId, isInTrash];
 }

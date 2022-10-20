@@ -1,3 +1,5 @@
+import 'package:evernote_clone/helpers/screen_arguments.dart';
+import 'package:evernote_clone/screens/note_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -70,6 +72,10 @@ class MyApp extends StatelessWidget {
             }
             if (settings.name == NoteListScreen.routeName) {
               return buildRoute(NoteListScreen(), settings);
+            }
+            if (settings.name == NoteInfoScreen.routeName) {
+              final args = settings.arguments as ScreenArguments;
+              return buildRoute(NoteInfoScreen(noteId: args.noteId), settings);
             }
           },
           title: 'Evernote Clone',

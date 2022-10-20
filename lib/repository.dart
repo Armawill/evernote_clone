@@ -80,7 +80,8 @@ class Repository {
         id: id,
         title: title,
         text: source.text,
-        date: DateTime.now(),
+        dateCreated: source.dateCreated,
+        dateUpdated: DateTime.now(),
         notebookId: notebookId);
   }
 
@@ -111,7 +112,8 @@ class Repository {
       id: note.id,
       title: note.title,
       text: note.text,
-      date: DateTime.now(),
+      dateCreated: note.dateCreated,
+      dateUpdated: DateTime.now(),
       notebookId: note.notebookId,
       isInTrash: true,
     );
@@ -136,7 +138,8 @@ class Repository {
       id: note.id,
       title: note.title,
       text: note.text,
-      date: DateTime.now(),
+      dateCreated: note.dateCreated,
+      dateUpdated: DateTime.now(),
       notebookId: note.notebookId,
       isInTrash: false,
     );
