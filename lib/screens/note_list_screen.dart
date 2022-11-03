@@ -104,11 +104,11 @@ class NoteListScreen extends StatelessWidget {
     showModalBottomSheet(
         context: ctx,
         shape: const RoundedRectangleBorder(
-            borderRadius:
-                const BorderRadius.vertical(top: const Radius.circular(10))),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(ctx).size.height * 0.75,
         ),
+        isScrollControlled: true,
         builder: (_) {
           if (notebook == TRASH) {
             return ModalBottomSheet.trashListMenu();
@@ -199,10 +199,6 @@ class NoteListScreen extends StatelessWidget {
               } else {
                 notes = state.loadedNotes;
               }
-
-              notes.sort(
-                (a, b) => b.dateUpdated.compareTo(a.dateUpdated),
-              );
 
               return _buildCustomScrollView(
                   context: context,

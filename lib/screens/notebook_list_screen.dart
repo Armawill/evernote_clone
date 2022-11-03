@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/widgets/app_floating_action_button.dart';
+import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,50 +23,6 @@ class NotebookListScreen extends StatelessWidget {
     _scaffoldKey.currentState?.openDrawer();
   }
 
-  Widget _notebooksModalBottomSheetBuilder(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          leading: Icon(
-            CustomIcons.add_notebook_filled,
-          ),
-          title: Text(
-            'New notebook',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.sort,
-          ),
-          title: Text(
-            'Sort by',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.settings,
-          ),
-          title: Text(
-            'Notebooks settings',
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          onTap: () {},
-        ),
-      ],
-    );
-  }
-
   void showMoreActions(BuildContext ctx) {
     showModalBottomSheet(
         context: ctx,
@@ -74,17 +31,10 @@ class NotebookListScreen extends StatelessWidget {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(ctx).size.height * 0.75,
         ),
+        isScrollControlled: true,
         builder: (_) {
-          return GestureDetector(
-            onTap: () {},
-            behavior: HitTestBehavior.opaque,
-            child: _notebooksModalBottomSheetBuilder(ctx),
-          );
-        }).then((_) {
-      // if (_wasDeletedOrRestored) {
-      //   Navigator.pop(context);
-      // }
-    });
+          return ModalBottomSheet.notebookListMenu();
+        });
   }
 
   @override

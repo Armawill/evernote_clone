@@ -196,6 +196,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         text: _editedNote.text,
                         dateCreated: _editedNote.dateCreated,
                         dateUpdated: _editedNote.dateUpdated,
+                        dateDeleted: _editedNote.dateDeleted,
                         notebookId: _editedNote.notebookId,
                       );
                       _focusTitle.unfocus();
@@ -219,6 +220,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                         text: value!,
                         dateCreated: _editedNote.dateCreated,
                         dateUpdated: _editedNote.dateUpdated,
+                        dateDeleted: _editedNote.dateDeleted,
                         notebookId: _editedNote.notebookId,
                       );
                       _focusText.unfocus();

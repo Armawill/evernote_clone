@@ -55,3 +55,13 @@ class ShowNotesFromNotebook extends NotesEvent {
 }
 
 class EmptyTrash extends NotesEvent {}
+
+class SortNotes extends NotesEvent {
+  final SortType sortType;
+  final bool descAscSort;
+
+  const SortNotes(this.sortType, this.descAscSort);
+
+  @override
+  List<Object> get props => [sortType, descAscSort];
+}

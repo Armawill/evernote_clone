@@ -41,6 +41,7 @@ dependencies:
   path: ^1.8.1
   sqflite: ^2.0.3+1
   another_flushbar: ^1.12.29
+  enum_to_string: ^2.0.1
 
 dev_dependencies:
   flutter_test:

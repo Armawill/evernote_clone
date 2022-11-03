@@ -18,6 +18,9 @@ class NoteProvider {
               text: note['text'],
               dateCreated: DateTime.parse(note['dateCreated']),
               dateUpdated: DateTime.parse(note['dateUpdated']),
+              dateDeleted: note['dateDeleted'] == 'null'
+                  ? null
+                  : DateTime.parse(note['dateDeleted']),
               notebookId: note['notebookId'],
               isInTrash: note['isInTrash'] == 0 ? false : true,
             ))
@@ -39,6 +42,9 @@ class NoteProvider {
           'text': note.text,
           'dateCreated': note.dateCreated.toIso8601String(),
           'dateUpdated': note.dateUpdated.toIso8601String(),
+          'dateDeleted': note.dateDeleted == null
+              ? 'null'
+              : note.dateDeleted!.toIso8601String(),
           'notebookId': note.notebookId,
           'isInTrash': note.isInTrash ? 1 : 0,
         },

@@ -1,5 +1,12 @@
 part of 'notes_bloc.dart';
 
+enum SortType {
+  dateDeleted,
+  dateUpdated,
+  dateCreated,
+  title,
+}
+
 class NotesState extends Equatable {
   final List<Note> loadedNotes;
   final List<Note> trashNotesList;
@@ -9,10 +16,17 @@ class NotesState extends Equatable {
   late final bool isTrashListEmpty;
   late final bool isTrashListNotEmpty;
 
+  /// If [descAscSort] is false, then the list of notes will be sorted in descending order, otherwise in ascending order.
+  final bool descAscSort;
+
+  final SortType sortType;
+
   NotesState({
     this.loadedNotes = const [],
     this.trashNotesList = const [],
     this.isLoading = true,
+    this.descAscSort = false,
+    this.sortType = SortType.dateUpdated,
   }) {
     isNoteListEmpty = loadedNotes.isEmpty;
     isNoteListNotEmpty = loadedNotes.isNotEmpty;
@@ -24,11 +38,15 @@ class NotesState extends Equatable {
     List<Note>? loadedNotes,
     List<Note>? trashNotesList,
     bool? isLoading,
+    bool? descAscSort,
+    SortType? sortType,
   }) =>
       NotesState(
         loadedNotes: loadedNotes ?? this.loadedNotes,
         trashNotesList: trashNotesList ?? this.trashNotesList,
         isLoading: isLoading ?? this.isLoading,
+        descAscSort: descAscSort ?? this.descAscSort,
+        sortType: sortType ?? this.sortType,
       );
 
   @override
@@ -37,6 +55,8 @@ class NotesState extends Equatable {
         isLoading,
         isNoteListEmpty,
         isTrashListEmpty,
+        descAscSort,
+        sortType,
       ];
 }
 
