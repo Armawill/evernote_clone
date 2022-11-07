@@ -1,7 +1,9 @@
 import 'package:evernote_clone/helpers/screen_arguments.dart';
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/screens/add_notebook_screen.dart';
+import 'package:evernote_clone/screens/note_details_screen.dart';
 import 'package:evernote_clone/screens/note_info_screen.dart';
+import 'package:evernote_clone/screens/note_list_screen.dart';
 import 'package:evernote_clone/widgets/sort_by_expansion_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +48,12 @@ class ModalBottomSheet extends StatelessWidget {
 
   ModalBottomSheet.trashNoteMenu({required this.note}) : notebookTitle = null {
     child = _trashNoteSheetBuilder;
+  }
+
+  ModalBottomSheet.noteListWidgetMenu()
+      : note = null,
+        notebookTitle = null {
+    child = _noteListWidgetSheetBuilder;
   }
 
   void _deleteNotebook(BuildContext context, String notebook) {
@@ -285,6 +293,40 @@ class ModalBottomSheet extends StatelessWidget {
             _emptyTrash(context);
             Navigator.pop(context);
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _noteListWidgetSheetBuilder(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildListTile(
+          context: context,
+          icon: Icons.arrow_forward_ios,
+          text: 'Go to Notes',
+          func: () {
+            Navigator.pop(context);
+            Navigator.of(context).pushNamed(NoteListScreen.routeName);
+          },
+        ),
+        _buildListTile(
+          context: context,
+          icon: CustomIcons.add_note_filled,
+          text: 'Create new note',
+          func: () {
+            Navigator.pop(context);
+            Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
+                arguments: {'notebookTitle': 'Notes'});
+          },
+        ),
+        _buildListTile(
+          context: context,
+          icon: Icons.remove_circle_outline,
+          text: 'Remove widget',
+          color: Colors.red,
+          func: () {},
         ),
       ],
     );

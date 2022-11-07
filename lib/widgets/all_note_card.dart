@@ -10,8 +10,8 @@ class AllNoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
+      margin: const EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: InkWell(
         onTap: () {
@@ -35,7 +35,7 @@ class AllNoteCard extends StatelessWidget {
                 text: TextSpan(
                   style: DefaultTextStyle.of(context).style,
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: 'Notes ',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

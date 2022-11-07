@@ -1,5 +1,6 @@
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/widgets/app_floating_action_button.dart';
+import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -123,13 +124,30 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pushNamed(NoteDetailsScreen.routeName);
+                                  Navigator.of(context).pushNamed(
+                                      NoteDetailsScreen.routeName,
+                                      arguments: {'notebookTitle': 'Notes'});
                                 },
                                 icon: const Icon(CustomIcons.add_note_outlined),
                               ),
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(10))),
+                                      constraints: BoxConstraints(
+                                        maxHeight:
+                                            MediaQuery.of(context).size.height *
+                                                0.75,
+                                      ),
+                                      isScrollControlled: true,
+                                      builder: (_) {
+                                        return ModalBottomSheet
+                                            .noteListWidgetMenu();
+                                      });
+                                },
                                 icon: const Icon(Icons.more_horiz),
                               ),
                             ],
