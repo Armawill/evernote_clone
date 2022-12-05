@@ -42,10 +42,21 @@ class Repository {
 
   Future<void> renameNotebook(String id, String newTitle) async {
     var index = notebookList.indexWhere((nb) => nb.id == id);
+    DateTime dateCreated, dateUpdated;
     if (index >= 0) {
       notebookList[index].title = newTitle;
+      dateCreated = notebookList[index].dateCreated;
+      dateUpdated = DateTime.now();
+    } else {
+      log('Error in repository.dart - renameNotebook');
+      throw ('Error in repository.dart - renameNotebook');
     }
-    await _notebookProvider.saveNotebook(Notebook(id: id, title: newTitle));
+    await _notebookProvider.saveNotebook(Notebook(
+      id: id,
+      title: newTitle,
+      dateCreated: dateCreated,
+      dateUpdated: dateUpdated,
+    ));
   }
 
   Future<void> getNotes() async {

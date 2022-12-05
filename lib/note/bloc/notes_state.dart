@@ -1,5 +1,6 @@
 part of 'notes_bloc.dart';
 
+/// enum SortType { dateDeleted, dateUpdated, dateCreated, title, }
 enum SortType {
   dateDeleted,
   dateUpdated,

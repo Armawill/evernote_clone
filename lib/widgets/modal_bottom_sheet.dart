@@ -156,7 +156,9 @@ class ModalBottomSheet extends StatelessWidget {
           text: 'View options',
           func: () {},
         ),
-        SortByExpansionPanel(),
+        SortByExpansionPanel(
+          blocType: BlocType.notesBloc,
+        ),
         _buildListTile(
           context: context,
           icon: Icons.filter_alt,
@@ -177,7 +179,7 @@ class ModalBottomSheet extends StatelessWidget {
           text: 'View options',
           func: () {},
         ),
-        SortByExpansionPanel(),
+        SortByExpansionPanel(blocType: BlocType.notesBloc),
         _buildListTile(
           context: context,
           icon: Icons.filter_alt,
@@ -222,12 +224,7 @@ class ModalBottomSheet extends StatelessWidget {
           text: 'New notebook',
           func: () {},
         ),
-        _buildListTile(
-          context: context,
-          icon: Icons.sort,
-          text: 'Sort by',
-          func: () {},
-        ),
+        SortByExpansionPanel(blocType: BlocType.notebooksBloc),
         _buildListTile(
           context: context,
           icon: Icons.settings,
@@ -283,7 +280,10 @@ class ModalBottomSheet extends StatelessWidget {
           text: 'View options',
           func: () {},
         ),
-        SortByExpansionPanel(isTrash: true),
+        SortByExpansionPanel(
+          isTrash: true,
+          blocType: BlocType.notesBloc,
+        ),
         _buildListTile(
           context: context,
           icon: Icons.delete,

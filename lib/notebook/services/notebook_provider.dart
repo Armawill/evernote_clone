@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../helpers/db_helper.dart';
 import '../../note/note.dart';
 import '../notebook.dart';
@@ -10,6 +12,8 @@ class NotebookProvider {
           .map((nb) => Notebook(
                 id: nb['id'],
                 title: nb['title'],
+                dateCreated: DateTime.parse(nb['dateCreated']),
+                dateUpdated: DateTime.parse(nb['dateUpdated']),
               ))
           .toList();
       for (int i = 0; i < notebooksLoaded.length; i++) {
@@ -41,6 +45,7 @@ class NotebookProvider {
       }
       return notebooksLoaded;
     } catch (err) {
+      log('$err');
       return [];
     }
   }
@@ -50,8 +55,11 @@ class NotebookProvider {
       DBHelper.insert('user_notebooks', {
         'id': notebook.id,
         'title': notebook.title,
+        'dateCreated': notebook.dateCreated.toIso8601String(),
+        'dateUpdated': notebook.dateUpdated.toIso8601String(),
       });
     } catch (err) {
+      log('$err');
       throw (err);
     }
   }
@@ -60,6 +68,7 @@ class NotebookProvider {
     try {
       DBHelper.delete('user_notebooks', id);
     } catch (err) {
+      log('$err');
       throw (err);
     }
   }

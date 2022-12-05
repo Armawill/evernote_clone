@@ -54,3 +54,13 @@ class RenameNotebookEvent extends NotebookEvent {
   @override
   List<Object> get props => [oldTitle, newTitle];
 }
+
+class SortNotebooks extends NotebookEvent {
+  final SortType sortType;
+  final bool descAscSort;
+
+  const SortNotebooks(this.sortType, this.descAscSort);
+
+  @override
+  List<Object> get props => [sortType, descAscSort];
+}

@@ -23,12 +23,14 @@ class DBHelper {
     await db.execute(
         'CREATE TABLE user_notes(id TEXT PRIMARY KEY, title TEXT, text TEXT, dateCreated TEXT, dateUpdated TEXT, dateDeleted TEXT, notebookId TEXT, isInTrash INTEGER)');
     await db.execute(
-        'CREATE TABLE user_notebooks(id TEXT PRIMARY KEY, title TEXT)');
+        'CREATE TABLE user_notebooks(id TEXT PRIMARY KEY, title TEXT, dateCreated TEXT, dateUpdated TEXT)');
     await db.insert(
       'user_notebooks',
       {
         'id': DateTime.now().toString(),
         'title': 'Interesting',
+        'dateCreated': DateTime.now().toIso8601String(),
+        'dateUpdated': DateTime.now().toIso8601String(),
       },
     );
   }

@@ -15,8 +15,8 @@ import './note_list_screen.dart';
 import './add_notebook_screen.dart';
 
 class NotebookListScreen extends StatelessWidget {
-  static final routeName = '/notebook-list';
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  static const routeName = '/notebook-list';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scrollController = ScrollController();
 
   void _openDrawer() {
@@ -26,7 +26,7 @@ class NotebookListScreen extends StatelessWidget {
   void showMoreActions(BuildContext ctx) {
     showModalBottomSheet(
         context: ctx,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(ctx).size.height * 0.75,
@@ -60,18 +60,18 @@ class NotebookListScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pushNamed(AddNotebookScreen.routeName);
                 },
-                icon: Icon(CustomIcons.add_notebook_filled),
+                icon: const Icon(CustomIcons.add_notebook_filled),
               ),
               IconButton(
                 onPressed: () {
                   showMoreActions(context);
                 },
-                icon: Icon(Icons.more_horiz),
+                icon: const Icon(Icons.more_horiz),
               ),
             ],
             pinned: true,
             expandedHeight: 100,
-            flexibleSpace: FlexibleSpaceBar(
+            flexibleSpace: const FlexibleSpaceBar(
               expandedTitleScale: 1,
               titlePadding: EdgeInsets.only(left: 15, bottom: 16),
               title: Text(
@@ -88,8 +88,11 @@ class NotebookListScreen extends StatelessWidget {
                   final notebooks = state.loadedNotebooks;
                   if (state.isLoading && notebooks.isEmpty) {
                     // if (state is NotebooksInitialState) {
-                    return Center(
-                      child: CircularProgressIndicator(),
+                    return Container(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     );
                   }
                   if (notebooks.isNotEmpty) {
@@ -110,7 +113,7 @@ class NotebookListScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 '${notebooks.length} Notebooks'.toUpperCase(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.grey,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -129,13 +132,14 @@ class NotebookListScreen extends StatelessWidget {
                                           height: 50,
                                           child: Row(
                                             children: [
-                                              Icon(CustomIcons.notebook_filled),
-                                              SizedBox(width: 10),
+                                              const Icon(
+                                                  CustomIcons.notebook_filled),
+                                              const SizedBox(width: 10),
                                               RichText(
                                                 text: TextSpan(children: [
                                                   TextSpan(
                                                     text: nb.title,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 16,
                                                     ),
@@ -143,7 +147,7 @@ class NotebookListScreen extends StatelessWidget {
                                                   TextSpan(
                                                     text:
                                                         ' (${nb.noteIdList.length})',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.grey,
                                                       fontSize: 14,
                                                     ),
@@ -160,9 +164,9 @@ class NotebookListScreen extends StatelessWidget {
                                     .pushNamed(AddNotebookScreen.routeName);
                               },
                               child: Row(
-                                children: [
+                                children: const [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 10),
+                                    padding: EdgeInsets.only(left: 10),
                                     child:
                                         Icon(CustomIcons.add_notebook_filled),
                                   ),

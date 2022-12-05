@@ -1,8 +1,13 @@
+import 'dart:developer';
+
+import 'package:evernote_clone/notebook/bloc/notebooks_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 
 import 'package:evernote_clone/note/note.dart';
+
+enum BlocType { notesBloc, notebooksBloc }
 
 class Item {
   final String title;
@@ -18,9 +23,10 @@ List<Item> items = [
 ];
 
 class SortByExpansionPanel extends StatefulWidget {
-  bool isTrash;
+  final bool isTrash;
+  final BlocType blocType;
 
-  SortByExpansionPanel({this.isTrash = false});
+  SortByExpansionPanel({required this.blocType, this.isTrash = false});
 
   @override
   State<SortByExpansionPanel> createState() => _SortByExpansionPanelState();
@@ -33,18 +39,38 @@ class _SortByExpansionPanelState extends State<SortByExpansionPanel> {
   /// If [descAscSort] is false, then the list of notes will be sorted in descending order, otherwise in ascending order.
   late bool descAscSort;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.blocType == BlocType.notesBloc) {
+      sortType = context.read<NotesBloc>().state.sortType;
+      descAscSort = context.read<NotesBloc>().state.descAscSort;
+    } else {
+      sortType = context.read<NotebooksBloc>().state.sortType;
+      descAscSort = context.read<NotebooksBloc>().state.descAscSort;
+    }
+  }
+
   void sort(SortType newSortType) {
     if (newSortType == sortType) {
       setState(() {
-        sortType = newSortType;
         descAscSort = !descAscSort;
       });
-      context.read<NotesBloc>().add(SortNotes(newSortType, descAscSort));
     } else {
       setState(() {
         sortType = newSortType;
       });
+    }
+
+    if (widget.blocType == BlocType.notesBloc) {
       context.read<NotesBloc>().add(SortNotes(newSortType, descAscSort));
+    } else if (widget.blocType == BlocType.notebooksBloc) {
+      context
+          .read<NotebooksBloc>()
+          .add(SortNotebooks(newSortType, descAscSort));
+    } else {
+      log('Error: bloc type is wrong');
     }
   }
 
@@ -57,9 +83,6 @@ class _SortByExpansionPanelState extends State<SortByExpansionPanel> {
       endIndent: 10,
     );
 
-    sortType = context.read<NotesBloc>().state.sortType;
-
-    descAscSort = context.read<NotesBloc>().state.descAscSort;
     var icon = descAscSort
         ? const Icon(Icons.arrow_upward)
         : const Icon(Icons.arrow_downward);

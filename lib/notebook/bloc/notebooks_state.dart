@@ -4,18 +4,30 @@ class NotebooksState extends Equatable {
   final List<Notebook> loadedNotebooks;
   final bool isLoading;
 
+  /// If [descAscSort] is false, then the list of notes will be sorted in descending order, otherwise in ascending order.
+  final bool descAscSort;
+
+  final SortType sortType;
+
   const NotebooksState({
     this.loadedNotebooks = const [],
     this.isLoading = false,
+    this.descAscSort = true,
+    this.sortType = SortType.dateCreated,
   });
 
   NotebooksState copyWith({
     List<Notebook>? loadedNotebooks,
     bool isLoading = false,
+    bool? descAscSort,
+    SortType? sortType,
   }) =>
       NotebooksState(
-          loadedNotebooks: loadedNotebooks ?? this.loadedNotebooks,
-          isLoading: isLoading);
+        loadedNotebooks: loadedNotebooks ?? this.loadedNotebooks,
+        isLoading: isLoading,
+        descAscSort: descAscSort ?? this.descAscSort,
+        sortType: sortType ?? this.sortType,
+      );
 
   @override
   List<Object> get props => [loadedNotebooks];
