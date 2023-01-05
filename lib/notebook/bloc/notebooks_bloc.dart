@@ -51,7 +51,7 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
 
     emit(state.copyWith(
         loadedNotebooks: sort(notebooks, state.sortType, state.descAscSort)));
-    repository.addNotebook(newNotebook);
+    repository.saveNotebook(newNotebook);
   }
 
   void _onNotebookRemoved(
@@ -96,6 +96,7 @@ class NotebooksBloc extends Bloc<NotebookEvent, NotebooksState> {
         state.sortType,
         state.descAscSort,
       )));
+      repository.saveNotebook(notebooks[nbIndex]);
     } else {
       log('Error in method _onNoteToNotebookAdded');
     }

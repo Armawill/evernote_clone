@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:search_highlight_text/search_highlight_text.dart';
 
 import '../helpers/datetime_helper.dart';
 import '../note/note.dart';
 import '../screens/note_details_screen.dart';
 
 class NoteItem extends StatelessWidget {
-  NoteItem(this.note, this._notebookTitle);
+  NoteItem(this.note, this._notebookTitle, [this.searchedString]);
   final Note note;
   final String _notebookTitle;
+  final String? searchedString;
 
   @override
   Widget build(BuildContext context) {
+    List<int> searchedStringIndexes = [];
+    int index = 0;
+    if (searchedString != null) {
+      while (note.title.indexOf(searchedString!, index) > 0) {
+        var nextIndex = note.title.indexOf(searchedString!, index);
+        searchedStringIndexes.add(nextIndex);
+        index = nextIndex;
+      }
+    }
     return ListTile(
       key: ValueKey(note.id),
       onTap: () {
@@ -32,15 +43,34 @@ class NoteItem extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
+                  child: SearchHighlightText(
+                    searchRegExp: RegExp(searchedString!, caseSensitive: false),
                     note.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    highlightStyle: TextStyle(
+                      backgroundColor: Colors.lime[400],
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-                Text(
-                  overflow: TextOverflow.ellipsis,
+                SearchHighlightText(
+                  searchRegExp: RegExp(searchedString!, caseSensitive: false),
                   note.text,
-                  style: TextStyle(color: Colors.grey[700], fontSize: 15),
+                  highlightStyle: TextStyle(
+                    backgroundColor: Colors.lime[400],
+                    color: Colors.grey[700],
+                    fontSize: 15,
+                  ),
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 15,
+                  ),
                   maxLines: 6,
                 ),
               ],

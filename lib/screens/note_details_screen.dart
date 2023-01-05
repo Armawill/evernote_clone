@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/repository.dart';
 import 'package:evernote_clone/screens/note_list_screen.dart';
+import 'package:evernote_clone/widgets/annotated_editable.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:search_highlight_text/search_highlight_text.dart';
 
 import '../note/note.dart';
 import '../notebook/bloc/notebooks_bloc.dart';
@@ -90,11 +93,13 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     String notebookTitle = '';
+    String searchString = '';
     if (ModalRoute.of(context)?.settings.arguments != null) {
       var data =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       var note = data['note'];
       var nbTitle = data['notebookTitle'];
+      var searchStr = data['searchString'];
       if (note is Note) {
         _editedNote = note;
       }
@@ -111,6 +116,10 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         } else {
           log('Error in NoteDetailsScreen');
         }
+      }
+
+      if (searchStr is String) {
+        searchString = searchStr;
       }
     }
 
@@ -143,7 +152,8 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                   },
                   icon: Icon(
                     Icons.check,
-                  )),
+                  ),
+                ),
           elevation: 0,
           actions: [
             IconButton(
@@ -156,6 +166,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         ),
         bottomNavigationBar: AppBottomAppBar(_openDrawer),
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -181,8 +192,11 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                   TextFormField(
                     enabled: _editedNote.isInTrash ? false : true,
                     initialValue: _editedNote.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                    decoration: InputDecoration(
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                    decoration: const InputDecoration(
                       hintText: 'Title',
                       hintStyle: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -204,10 +218,11 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     onTap: editModeOn,
                     focusNode: _focusTitle,
                   ),
-                  TextFormField(
+                  RichTextControllerDemo(
+                    regExpStr: searchString,
                     enabled: _editedNote.isInTrash ? false : true,
                     initialValue: _editedNote.text,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Start writing',
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                     ),

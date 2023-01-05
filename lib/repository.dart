@@ -25,8 +25,14 @@ class Repository {
     }
   }
 
-  Future<void> addNotebook(Notebook notebook) async {
-    notebookList.add(notebook);
+  Future<void> saveNotebook(Notebook notebook) async {
+    final nbIndex = notebookList.indexWhere((nb) => nb.id == notebook.id);
+    if (nbIndex < 0) {
+      notebookList.add(notebook);
+    } else {
+      notebookList[nbIndex] = notebook;
+    }
+
     await _notebookProvider.saveNotebook(notebook);
   }
 

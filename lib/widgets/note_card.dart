@@ -22,8 +22,10 @@ class NoteCard extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(NoteDetailsScreen.routeName,
-              arguments: {'note': note, 'notebookId': note.notebookId});
+          Navigator.of(context)
+              .pushNamed(NoteDetailsScreen.routeName, arguments: {
+            'note': note, /*'notebookId': note.notebookId*/
+          });
         },
         splashFactory: NoSplash.splashFactory,
         child: Container(
