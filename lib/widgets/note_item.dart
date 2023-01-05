@@ -44,7 +44,8 @@ class NoteItem extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: SearchHighlightText(
-                    searchRegExp: RegExp(searchedString!, caseSensitive: false),
+                    searchRegExp:
+                        RegExp(searchedString ?? '', caseSensitive: false),
                     note.title,
                     highlightStyle: TextStyle(
                       backgroundColor: Colors.lime[400],
@@ -60,7 +61,8 @@ class NoteItem extends StatelessWidget {
                   ),
                 ),
                 SearchHighlightText(
-                  searchRegExp: RegExp(searchedString!, caseSensitive: false),
+                  searchRegExp:
+                      RegExp(searchedString ?? '', caseSensitive: false),
                   note.text,
                   highlightStyle: TextStyle(
                     backgroundColor: Colors.lime[400],

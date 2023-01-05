@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:evernote_clone/presentation/custom_icons_icons.dart';
 import 'package:evernote_clone/repository.dart';
 import 'package:evernote_clone/screens/note_list_screen.dart';
-import 'package:evernote_clone/widgets/annotated_editable.dart';
 import 'package:evernote_clone/widgets/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -218,15 +217,14 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                     onTap: editModeOn,
                     focusNode: _focusTitle,
                   ),
-                  RichTextControllerDemo(
-                    regExpStr: searchString,
+                  TextFormField(
                     enabled: _editedNote.isInTrash ? false : true,
                     initialValue: _editedNote.text,
                     decoration: const InputDecoration(
                       hintText: 'Start writing',
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                     ),
-                    maxLines: null,
+                    maxLines: 6,
                     focusNode: _focusText,
                     onSaved: (value) {
                       _editedNote = Note(
